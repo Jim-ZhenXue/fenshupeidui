@@ -65,6 +65,13 @@ export default function Balance({ leftItem, rightItem, onLeftDrop, onRightDrop }
 
   return (
     <div className="relative w-80 h-40">
+      {/* 支柱 - 不旋转的部分 */}
+      <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-2 h-32 bg-gray-700" />
+      
+      {/* 底座 - 不旋转的部分 */}
+      <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-40 h-2 bg-gray-800 rounded" />
+
+      {/* 旋转的部分：横梁和天平盘 */}
       <div
         className="absolute inset-0 transition-transform duration-500 ease-in-out"
         style={{
@@ -72,9 +79,6 @@ export default function Balance({ leftItem, rightItem, onLeftDrop, onRightDrop }
           transform: `rotate(${rotation}deg)`,
         }}
       >
-        {/* 支柱 */}
-        <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-2 h-32 bg-gray-700" />
-
         {/* 横梁 */}
         <div className="absolute top-8 left-1/2 -translate-x-1/2 w-80 h-2 bg-gray-700 rounded" />
 
@@ -96,10 +100,6 @@ export default function Balance({ leftItem, rightItem, onLeftDrop, onRightDrop }
           {renderItem(rightItem)}
         </div>
       </div>
-
-      {/* 底座 */}
-      <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-40 h-2 bg-gray-800 rounded" />
     </div>
   )
 }
-

@@ -25,24 +25,43 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
       backgroundColor: '#ffffff',
       scene: {
         create: function(this: Phaser.Scene) {
-          // 创建支柱
-          this.add.rectangle(400, 350, 20, 200, 0x4a5568)
           // 创建底座
           this.add.rectangle(400, 380, 200, 20, 0x2d3748)
           
+          // 创建支柱
+          this.add.rectangle(400, 350, 20, 200, 0x4a5568)
+          
           // 创建横梁组
           const beam = this.add.container(400, 250)
+          
+          // 创建横梁主体
           const beamRect = this.add.rectangle(0, 0, 400, 10, 0x4a5568)
           
           // 创建左盘
-          const leftPlate = this.add.rectangle(-180, 30, 100, 100, 0xffffff)
+          const leftPlate = this.add.rectangle(-190, 45, 100, 100, 0xffffff)
           leftPlate.setStrokeStyle(4, 0x4a5568)
           
           // 创建右盘
-          const rightPlate = this.add.rectangle(180, 30, 100, 100, 0xffffff)
+          const rightPlate = this.add.rectangle(190, 45, 100, 100, 0xffffff)
           rightPlate.setStrokeStyle(4, 0x4a5568)
           
-          beam.add([beamRect, leftPlate, rightPlate])
+          // 创建左边链条
+          const leftChainGraphics = this.add.graphics()
+          leftChainGraphics.lineStyle(4, 0x4a5568)
+          leftChainGraphics.beginPath()
+          leftChainGraphics.moveTo(-190, 0)
+          leftChainGraphics.lineTo(-190, 45)
+          leftChainGraphics.strokePath()
+          
+          // 创建右边链条
+          const rightChainGraphics = this.add.graphics()
+          rightChainGraphics.lineStyle(4, 0x4a5568)
+          rightChainGraphics.beginPath()
+          rightChainGraphics.moveTo(190, 0)
+          rightChainGraphics.lineTo(190, 45)
+          rightChainGraphics.strokePath()
+          
+          beam.add([beamRect, leftChainGraphics, rightChainGraphics, leftPlate, rightPlate])
           
           // 添加交互
           leftPlate.setInteractive()

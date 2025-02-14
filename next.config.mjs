@@ -21,34 +21,47 @@ const nextConfig = {
     parallelServerBuildTraces: false,
     parallelServerCompiles: false,
   },
+  output: 'standalone',
+  swcMinify: true,
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
-      // 生产环境客户端优化
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          minSize: 20000,
-          maxSize: 24000000, // 24MB 以确保在 25MB 限制之内
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            commons: {
-              name: 'commons',
-              chunks: 'all',
-              minChunks: 2,
-            },
-            lib: {
-              test: /[\\/]node_modules[\\/]/,
-              name(module) {
-                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-                return `npm.${packageName.replace('@', '')}`;
-              },
-              chunks: 'all',
-            },
+      // 禁用一些不必要的功能
+      config.optimization.moduleIds = 'deterministic';
+      config.optimization.runtimeChunk = false;
+      
+      // 配置分块策略
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        maxInitialRequests: 25,
+        minSize: 20000,
+        maxSize: 20000000,
+        cacheGroups: {
+          default: false,
+          vendors: false,
+          framework: {
+            chunks: 'all',
+            name: 'framework',
+            test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|next|@next)[\\/]/,
+            priority: 40,
+            enforce: true,
+          },
+          commons: {
+            name: 'commons',
+            minChunks: 2,
+            priority: 20,
+          },
+          lib: {
+            test: /[\\/]node_modules[\\/]/,
+            priority: 10,
+            reuseExistingChunk: true,
+            minChunks: 1,
+            maxSize: 20000000,
           },
         },
       };
+
+      // 启用压缩
+      config.optimization.minimize = true;
     }
     return config;
   },

@@ -26,42 +26,39 @@ const nextConfig = {
       
       // 禁用一些不必要的功能
       config.optimization.moduleIds = 'deterministic';
-      config.optimization.runtimeChunk = false;
+      config.optimization.runtimeChunk = 'single';
       config.optimization.concatenateModules = true;
       
       // 配置分块策略
       config.optimization.splitChunks = {
         chunks: 'all',
-        maxInitialRequests: 25,
+        maxInitialRequests: 10,
         minSize: 20000,
-        maxSize: 24000,
+        maxSize: 50000,
         cacheGroups: {
-          default: false,
-          vendors: false,
           framework: {
             name: 'framework',
-            chunks: 'all',
-            test: /[\\/]node_modules[\\/](@?react|react-dom|scheduler|next|@next)[\\/]/,
+            test: /[\\/]node_modules[\\/](react|react-dom|scheduler|next|@next)[\\/]/,
             priority: 40,
             enforce: true,
-            maxSize: 24000,
+            reuseExistingChunk: true,
           },
-          lib: {
-            test: /[\\/]node_modules[\\/]/,
-            name(module) {
-              const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-              return `npm.${packageName.replace('@', '')}`;
-            },
+          phaser: {
+            name: 'phaser',
+            test: /[\\/]node_modules[\\/]phaser[\\/]/,
             priority: 30,
-            minChunks: 1,
-            maxSize: 24000,
+            enforce: true,
             reuseExistingChunk: true,
           },
           commons: {
             name: 'commons',
             minChunks: 2,
             priority: 20,
-            maxSize: 24000,
+            reuseExistingChunk: true,
+          },
+          default: {
+            minChunks: 1,
+            priority: 10,
             reuseExistingChunk: true,
           }
         }

@@ -16,62 +16,41 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  output: 'export',
-  trailingSlash: true,
-  distDir: '.output',
   swcMinify: true,
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
-      // 禁用缓存
       config.cache = false;
-      
-      // 禁用一些不必要的功能
-      config.optimization.moduleIds = 'deterministic';
-      config.optimization.runtimeChunk = 'single';
-      config.optimization.concatenateModules = true;
-      
-      // 配置分块策略
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        maxInitialRequests: 10,
-        minSize: 20000,
-        maxSize: 50000,
-        cacheGroups: {
-          framework: {
-            name: 'framework',
-            test: /[\\/]node_modules[\\/](react|react-dom|scheduler|next|@next)[\\/]/,
-            priority: 40,
-            enforce: true,
-            reuseExistingChunk: true,
-          },
-          phaser: {
-            name: 'phaser',
-            test: /[\\/]node_modules[\\/]phaser[\\/]/,
-            priority: 30,
-            enforce: true,
-            reuseExistingChunk: true,
-          },
-          commons: {
-            name: 'commons',
-            minChunks: 2,
-            priority: 20,
-            reuseExistingChunk: true,
-          },
-          default: {
-            minChunks: 1,
-            priority: 10,
-            reuseExistingChunk: true,
+      config.optimization = {
+        ...config.optimization,
+        moduleIds: 'deterministic',
+        runtimeChunk: 'single',
+        concatenateModules: true,
+        splitChunks: {
+          chunks: 'all',
+          maxInitialRequests: 10,
+          minSize: 20000,
+          maxSize: 50000,
+          cacheGroups: {
+            framework: {
+              name: 'framework',
+              test: /[\\/]node_modules[\\/](react|react-dom|scheduler|next|@next)[\\/]/,
+              priority: 40,
+              enforce: true,
+              reuseExistingChunk: true,
+            },
+            phaser: {
+              name: 'phaser',
+              test: /[\\/]node_modules[\\/]phaser[\\/]/,
+              priority: 30,
+              enforce: true,
+              reuseExistingChunk: true,
+            }
           }
         }
-      };
-
-      // 启用压缩
-      config.optimization.minimize = true;
-      config.optimization.usedExports = true;
-      config.optimization.providedExports = true;
+      }
     }
-    return config;
-  },
+    return config
+  }
 }
 
 mergeConfig(nextConfig, userConfig)

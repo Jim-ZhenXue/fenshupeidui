@@ -17,6 +17,7 @@ const nextConfig = {
     unoptimized: true,
   },
   output: 'export',
+  trailingSlash: true,
   distDir: '.output',
   swcMinify: true,
   webpack: (config, { dev, isServer }) => {

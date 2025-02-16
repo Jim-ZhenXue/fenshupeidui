@@ -15,8 +15,18 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
   swcMinify: true,
+  output: 'standalone',
+  experimental: {
+    runtime: 'edge',
+  },
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
       config.cache = false;

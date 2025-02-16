@@ -23,10 +23,7 @@ const nextConfig = {
     ],
   },
   swcMinify: true,
-  output: 'standalone',
-  experimental: {
-    runtime: 'edge',
-  },
+  output: 'export',
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
       config.cache = false;

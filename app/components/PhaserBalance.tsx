@@ -38,11 +38,11 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           const beamRect = this.add.rectangle(0, 0, 400, 10, 0x4a5568)
           
           // 创建左盒子
-          const leftBox = this.add.rectangle(-190, 45, 60, 60, 0xffffff)
+          const leftBox = this.add.rectangle(-190, 67, 60, 60, 0xffffff)
           leftBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建右盒子
-          const rightBox = this.add.rectangle(190, 45, 60, 60, 0xffffff)
+          const rightBox = this.add.rectangle(190, 67, 60, 60, 0xffffff)
           rightBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建左边吊线
@@ -50,7 +50,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           leftLineGraphics.lineStyle(2, 0x4a5568)
           leftLineGraphics.beginPath()
           leftLineGraphics.moveTo(-190, 0)
-          leftLineGraphics.lineTo(-190, 15)
+          leftLineGraphics.lineTo(-190, 67)
           leftLineGraphics.strokePath()
           
           // 创建右边吊线
@@ -58,7 +58,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           rightLineGraphics.lineStyle(2, 0x4a5568)
           rightLineGraphics.beginPath()
           rightLineGraphics.moveTo(190, 0)
-          rightLineGraphics.lineTo(190, 15)
+          rightLineGraphics.lineTo(190, 67)
           rightLineGraphics.strokePath()
           
           beam.add([beamRect, leftLineGraphics, rightLineGraphics, leftBox, rightBox])

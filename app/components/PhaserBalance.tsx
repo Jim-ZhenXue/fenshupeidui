@@ -38,30 +38,53 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           const beamRect = this.add.rectangle(0, 0, 400, 10, 0x4a5568)
           
           // 创建左盒子
-          const leftBox = this.add.rectangle(-190, 67, 60, 60, 0xffffff)
+          const leftBox = this.add.rectangle(210, 317, 60, 60, 0xffffff)
           leftBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建右盒子
-          const rightBox = this.add.rectangle(190, 67, 60, 60, 0xffffff)
+          const rightBox = this.add.rectangle(590, 317, 60, 60, 0xffffff)
           rightBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建左边吊线
-          const leftLineGraphics = this.add.graphics()
-          leftLineGraphics.lineStyle(2, 0x4a5568)
-          leftLineGraphics.beginPath()
-          leftLineGraphics.moveTo(-190, 0)
-          leftLineGraphics.lineTo(-190, 67)
-          leftLineGraphics.strokePath()
+          const leftLine = this.add.graphics()
           
           // 创建右边吊线
-          const rightLineGraphics = this.add.graphics()
-          rightLineGraphics.lineStyle(2, 0x4a5568)
-          rightLineGraphics.beginPath()
-          rightLineGraphics.moveTo(190, 0)
-          rightLineGraphics.lineTo(190, 67)
-          rightLineGraphics.strokePath()
+          const rightLine = this.add.graphics()
           
-          beam.add([beamRect, leftLineGraphics, rightLineGraphics, leftBox, rightBox])
+          // 更新吊线函数
+          const updateLines = () => {
+            // 获取横梁端点的世界坐标
+            const leftBeamPoint = new Phaser.Math.Vector2(-190, 0)
+            const rightBeamPoint = new Phaser.Math.Vector2(190, 0)
+            const rotationMatrix = new Phaser.GameObjects.Components.TransformMatrix()
+            beam.getWorldTransformMatrix(rotationMatrix)
+            const leftWorldPoint = rotationMatrix.transformPoint(leftBeamPoint.x, leftBeamPoint.y)
+            const rightWorldPoint = rotationMatrix.transformPoint(rightBeamPoint.x, rightBeamPoint.y)
+            
+            // 盒子高度的一半（用于计算吊线终点）
+            const boxHalfHeight = 30  // 60/2
+            
+            // 清除并重绘吊线
+            leftLine.clear()
+            leftLine.lineStyle(2, 0x4a5568)
+            leftLine.beginPath()
+            leftLine.moveTo(leftWorldPoint.x, leftWorldPoint.y)
+            leftLine.lineTo(leftWorldPoint.x, leftWorldPoint.y + 67 - boxHalfHeight)  // 减去盒子高度的一半
+            leftLine.strokePath()
+            
+            rightLine.clear()
+            rightLine.lineStyle(2, 0x4a5568)
+            rightLine.beginPath()
+            rightLine.moveTo(rightWorldPoint.x, rightWorldPoint.y)
+            rightLine.lineTo(rightWorldPoint.x, rightWorldPoint.y + 67 - boxHalfHeight)  // 减去盒子高度的一半
+            rightLine.strokePath()
+            
+            // 更新盒子位置
+            leftBox.setPosition(leftWorldPoint.x, leftWorldPoint.y + 67)
+            rightBox.setPosition(rightWorldPoint.x, rightWorldPoint.y + 67)
+          }
+          
+          beam.add([beamRect])
           
           // 添加交互
           leftBox.setInteractive()
@@ -75,8 +98,14 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             targets: beam,
             angle: leftItem && !rightItem ? -5 : rightItem && !leftItem ? 5 : 0,
             duration: 500,
-            ease: 'Power2'
+            ease: 'Power2',
+            onUpdate: () => {
+              updateLines()
+            }
           })
+          
+          // 初始化吊线位置
+          updateLines()
         }
       }
     }

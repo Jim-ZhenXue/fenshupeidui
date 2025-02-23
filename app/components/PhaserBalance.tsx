@@ -29,20 +29,20 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           this.add.rectangle(400, 380, 200, 20, 0x2d3748)
           
           // 创建支柱
-          this.add.rectangle(400, 350, 20, 200, 0x4a5568)
+          this.add.rectangle(400, 210, 20, 320, 0x4a5568)
           
           // 创建横梁组
-          const beam = this.add.container(400, 250)
+          const beam = this.add.container(400, 170)
           
           // 创建横梁主体
           const beamRect = this.add.rectangle(0, 0, 400, 10, 0x4a5568)
           
           // 创建左盒子
-          const leftBox = this.add.rectangle(210, 317, 60, 60, 0xffffff)
+          const leftBox = this.add.rectangle(210, 237, 60, 60, 0xffffff)
           leftBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建右盒子
-          const rightBox = this.add.rectangle(590, 317, 60, 60, 0xffffff)
+          const rightBox = this.add.rectangle(590, 237, 60, 60, 0xffffff)
           rightBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建左边吊线

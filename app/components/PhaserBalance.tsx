@@ -37,38 +37,38 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           // 创建横梁主体
           const beamRect = this.add.rectangle(0, 0, 400, 10, 0x4a5568)
           
-          // 创建左盘
-          const leftPlate = this.add.rectangle(-190, 45, 100, 100, 0xffffff)
-          leftPlate.setStrokeStyle(4, 0x4a5568)
+          // 创建左盒子
+          const leftBox = this.add.rectangle(-190, 45, 60, 60, 0xffffff)
+          leftBox.setStrokeStyle(4, 0x4a5568)
           
-          // 创建右盘
-          const rightPlate = this.add.rectangle(190, 45, 100, 100, 0xffffff)
-          rightPlate.setStrokeStyle(4, 0x4a5568)
+          // 创建右盒子
+          const rightBox = this.add.rectangle(190, 45, 60, 60, 0xffffff)
+          rightBox.setStrokeStyle(4, 0x4a5568)
           
-          // 创建左边链条
-          const leftChainGraphics = this.add.graphics()
-          leftChainGraphics.lineStyle(4, 0x4a5568)
-          leftChainGraphics.beginPath()
-          leftChainGraphics.moveTo(-190, 0)
-          leftChainGraphics.lineTo(-190, 45)
-          leftChainGraphics.strokePath()
+          // 创建左边吊线
+          const leftLineGraphics = this.add.graphics()
+          leftLineGraphics.lineStyle(2, 0x4a5568)
+          leftLineGraphics.beginPath()
+          leftLineGraphics.moveTo(-190, 0)
+          leftLineGraphics.lineTo(-190, 15)
+          leftLineGraphics.strokePath()
           
-          // 创建右边链条
-          const rightChainGraphics = this.add.graphics()
-          rightChainGraphics.lineStyle(4, 0x4a5568)
-          rightChainGraphics.beginPath()
-          rightChainGraphics.moveTo(190, 0)
-          rightChainGraphics.lineTo(190, 45)
-          rightChainGraphics.strokePath()
+          // 创建右边吊线
+          const rightLineGraphics = this.add.graphics()
+          rightLineGraphics.lineStyle(2, 0x4a5568)
+          rightLineGraphics.beginPath()
+          rightLineGraphics.moveTo(190, 0)
+          rightLineGraphics.lineTo(190, 15)
+          rightLineGraphics.strokePath()
           
-          beam.add([beamRect, leftChainGraphics, rightChainGraphics, leftPlate, rightPlate])
+          beam.add([beamRect, leftLineGraphics, rightLineGraphics, leftBox, rightBox])
           
           // 添加交互
-          leftPlate.setInteractive()
-          rightPlate.setInteractive()
+          leftBox.setInteractive()
+          rightBox.setInteractive()
           
-          this.input.setDraggable(leftPlate)
-          this.input.setDraggable(rightPlate)
+          this.input.setDraggable(leftBox)
+          this.input.setDraggable(rightBox)
           
           // 添加动画效果
           this.tweens.add({

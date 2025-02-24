@@ -24,7 +24,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
       height: 300,
       backgroundColor: '#ffffff',
       input: {
-        activePointers: 1,
+        activePointers: 2,
         touch: {
           capture: true
         }
@@ -152,17 +152,30 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
     // 创建游戏实例
     gameRef.current = new Phaser.Game(config)
 
+    // 添加自定义事件监听器
+    const handleCustomDrop = (event: CustomEvent) => {
+      const { data, side } = event.detail
+      if (side === 'left') {
+        onLeftDrop(data)
+      } else {
+        onRightDrop(data)
+      }
+    }
+
+    parentRef.current.addEventListener('custom-drop', handleCustomDrop as EventListener)
+
     return () => {
       if (gameRef.current) {
         gameRef.current.destroy(true)
       }
+      parentRef.current?.removeEventListener('custom-drop', handleCustomDrop as EventListener)
     }
   }, [leftItem, rightItem])
 
   return (
     <div 
       ref={parentRef} 
-      className="w-full h-[300px]"
+      className="w-full h-[300px] phaser-balance"
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault()

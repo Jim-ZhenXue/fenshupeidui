@@ -1,6 +1,7 @@
 "use client"
 
-import type React from "react"
+import { useEffect } from "react"
+import type { DragEvent } from "react"
 
 interface FractionType {
   type: "numeric" | "block" | "circle"
@@ -29,9 +30,72 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     { type: "block", color: "bg-sky-400", parts: 3, filled: 2 },
   ]
 
-  const handleDragStart = (e: React.DragEvent, fraction: FractionType) => {
-    e.dataTransfer.setData("text/plain", JSON.stringify(fraction))
+  const handleDragStart = (e: DragEvent | React.TouchEvent, fraction: FractionType) => {
+    if ('dataTransfer' in e) {
+      // Mouse drag event
+      e.dataTransfer.setData("text/plain", JSON.stringify(fraction))
+    } else {
+      // Touch event
+      const touch = e.touches[0]
+      const target = e.target as HTMLElement
+      const clone = target.cloneNode(true) as HTMLElement
+      
+      clone.style.position = 'fixed'
+      clone.style.left = touch.clientX - target.offsetWidth / 2 + 'px'
+      clone.style.top = touch.clientY - target.offsetHeight / 2 + 'px'
+      clone.style.opacity = '0.8'
+      clone.style.pointerEvents = 'none'
+      clone.id = 'dragging-clone'
+      
+      document.body.appendChild(clone)
+      
+      // Store the fraction data on the clone element
+      ;(window as any).dragData = fraction
+    }
   }
+
+  const handleTouchMove = (e: Event) => {
+    const clone = document.getElementById('dragging-clone')
+    if (clone && e instanceof TouchEvent) {
+      const touch = e.touches[0]
+      clone.style.left = touch.clientX - clone.offsetWidth / 2 + 'px'
+      clone.style.top = touch.clientY - clone.offsetHeight / 2 + 'px'
+    }
+  }
+
+  const handleTouchEnd = (e: Event) => {
+    const clone = document.getElementById('dragging-clone')
+    if (clone && e instanceof TouchEvent) {
+      const touch = e.changedTouches[0]
+      const elements = document.elementsFromPoint(touch.clientX, touch.clientY)
+      const dropTarget = elements.find(el => el.classList.contains('phaser-balance'))
+      
+      if (dropTarget) {
+        const rect = dropTarget.getBoundingClientRect()
+        const x = touch.clientX - rect.left
+        const event = new CustomEvent('custom-drop', {
+          detail: {
+            data: (window as any).dragData,
+            side: x < rect.width / 2 ? 'left' : 'right'
+          }
+        })
+        dropTarget.dispatchEvent(event)
+      }
+      
+      clone.remove()
+      delete (window as any).dragData
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('touchmove', handleTouchMove)
+    document.addEventListener('touchend', handleTouchEnd)
+    
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [])
 
   return (
     <div className="w-full grid grid-cols-2 gap-1 border border-gray-700 p-1 bg-gray-900">
@@ -41,6 +105,7 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
           className="aspect-square border border-gray-700 p-1 cursor-move text-[0.6rem] bg-gray-800"
           draggable
           onDragStart={(e) => handleDragStart(e, fraction)}
+          onTouchStart={(e) => handleDragStart(e, fraction)}
         >
           {fraction.type === "numeric" ? (
             <div className="flex h-full items-center justify-center text-xl text-white">{fraction.value}</div>

@@ -23,6 +23,12 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
       width: 500,
       height: 300,
       backgroundColor: '#ffffff',
+      input: {
+        activePointers: 1,
+        touch: {
+          capture: true
+        }
+      },
       scene: {
         create: function(this: Phaser.Scene) {
           // 创建底座
@@ -90,27 +96,40 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           beam.add([beamRect])
           
           // 添加交互
-          leftBox.setInteractive({ draggable: true })
-          rightBox.setInteractive({ draggable: true })
+          leftBox.setInteractive()
+          rightBox.setInteractive()
           
-          // 拖动开始事件
-          this.input.on('dragstart', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Rectangle) => {
-            gameObject.setTint(0xaaaaaa)
+          let dragTarget: Phaser.GameObjects.Rectangle | null = null
+          
+          // 触摸/鼠标按下事件
+          this.input.on('pointerdown', (pointer: Phaser.Input.Pointer, targets: Phaser.GameObjects.GameObject[]) => {
+            if (targets.length > 0) {
+              const target = targets[0] as Phaser.GameObjects.Rectangle
+              if (target === leftBox || target === rightBox) {
+                dragTarget = target
+                target.setTint(0xaaaaaa)
+              }
+            }
           })
 
-          // 拖动中事件
-          this.input.on('drag', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Rectangle, dragX: number, dragY: number) => {
-            gameObject.x = dragX
-            gameObject.y = dragY
+          // 触摸/鼠标移动事件
+          this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+            if (dragTarget && pointer.isDown) {
+              dragTarget.x = pointer.x
+              dragTarget.y = pointer.y
+            }
           })
 
-          // 拖动结束事件
-          this.input.on('dragend', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Rectangle) => {
-            gameObject.clearTint()
-            const dropZone = gameObject === leftBox ? onLeftDrop : onRightDrop
-            const item = gameObject === leftBox ? leftItem : rightItem
-            dropZone(item)
-            updateLines()
+          // 触摸/鼠标松开事件
+          this.input.on('pointerup', () => {
+            if (dragTarget) {
+              dragTarget.clearTint()
+              const dropZone = dragTarget === leftBox ? onLeftDrop : onRightDrop
+              const item = dragTarget === leftBox ? leftItem : rightItem
+              dropZone(item)
+              updateLines()
+              dragTarget = null
+            }
           })
 
           // 添加动画效果

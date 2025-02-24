@@ -40,17 +40,11 @@ export default function FractionMatcher() {
     <div className="min-h-screen bg-black p-4">
       <div className="mx-auto max-w-4xl">
         <div className="mb-4 flex items-center justify-between text-white">
-          <div className="text-xl font-bold">My Matches</div>
-          <div className="text-right">
-            <div className="text-lg font-semibold">Level: {level}</div>
-            <div className="text-lg font-semibold">Score: {score}</div>
+          <div className="text-xl font-bold">配对</div>
+          <div className="text-lg font-semibold absolute left-1/2 -translate-x-1/2">Score: {score}</div>
+          <div className="w-8 h-8 flex items-center justify-center">
+            <RefreshCw className="h-4 w-4 text-white" />
           </div>
-        </div>
-
-        <div className="mb-4 flex gap-2">
-          <Button variant="outline" size="icon">
-            <RefreshCw className="h-4 w-4" />
-          </Button>
         </div>
 
         <div className="mb-8">

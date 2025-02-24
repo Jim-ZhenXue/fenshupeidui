@@ -21,31 +21,31 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
       type: Phaser.AUTO,
       parent: parentRef.current,
       width: 800,
-      height: 400,
+      height: 300,
       backgroundColor: '#ffffff',
       scene: {
         create: function(this: Phaser.Scene) {
           // 创建底座
-          this.add.rectangle(400, 380, 200, 20, 0x2d3748)
+          this.add.rectangle(400, 280, 200, 20, 0x2d3748)
           
           // 创建支柱
-          this.add.rectangle(400, 267.5, 20, 245, 0x4a5568)
+          this.add.rectangle(400, 182.5, 20, 215, 0x4a5568)
           
           // 创建支柱尖头
-          const pillarTip = this.add.triangle(400, 135, 0, 20, 10, 0, 20, 20, 0x4a5568)
+          const pillarTip = this.add.triangle(400, 65, 0, 20, 10, 0, 20, 20, 0x4a5568)
           
           // 创建横梁组
-          const beam = this.add.container(400, 170)
+          const beam = this.add.container(400, 100)
           
           // 创建横梁主体
           const beamRect = this.add.rectangle(0, 0, 400, 10, 0x4a5568)
           
           // 创建左盒子
-          const leftBox = this.add.rectangle(210, 237, 60, 60, 0xffffff)
+          const leftBox = this.add.rectangle(210, 152, 60, 60, 0xffffff)
           leftBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建右盒子
-          const rightBox = this.add.rectangle(590, 237, 60, 60, 0xffffff)
+          const rightBox = this.add.rectangle(590, 152, 60, 60, 0xffffff)
           rightBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建左边吊线
@@ -72,19 +72,19 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             leftLine.lineStyle(2, 0x4a5568)
             leftLine.beginPath()
             leftLine.moveTo(leftWorldPoint.x, leftWorldPoint.y)
-            leftLine.lineTo(leftWorldPoint.x, leftWorldPoint.y + 67 - boxHalfHeight)  // 减去盒子高度的一半
+            leftLine.lineTo(leftWorldPoint.x, leftWorldPoint.y + 52 - boxHalfHeight)  // 减去盒子高度的一半
             leftLine.strokePath()
             
             rightLine.clear()
             rightLine.lineStyle(2, 0x4a5568)
             rightLine.beginPath()
             rightLine.moveTo(rightWorldPoint.x, rightWorldPoint.y)
-            rightLine.lineTo(rightWorldPoint.x, rightWorldPoint.y + 67 - boxHalfHeight)  // 减去盒子高度的一半
+            rightLine.lineTo(rightWorldPoint.x, rightWorldPoint.y + 52 - boxHalfHeight)  // 减去盒子高度的一半
             rightLine.strokePath()
             
             // 更新盒子位置
-            leftBox.setPosition(leftWorldPoint.x, leftWorldPoint.y + 67)
-            rightBox.setPosition(rightWorldPoint.x, rightWorldPoint.y + 67)
+            leftBox.setPosition(leftWorldPoint.x, leftWorldPoint.y + 52)
+            rightBox.setPosition(rightWorldPoint.x, rightWorldPoint.y + 52)
           }
           
           beam.add([beamRect])
@@ -126,7 +126,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
   return (
     <div 
       ref={parentRef} 
-      className="w-full h-[400px]"
+      className="w-full h-[300px]"
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault()

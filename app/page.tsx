@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, RefreshCw } from "lucide-react"
+import { RefreshCw } from "lucide-react"
 import FractionGrid from "./fraction-grid"
 import FractionDisplay from "./fraction-display"
 import Balance from "./balance"
@@ -48,9 +48,6 @@ export default function FractionMatcher() {
         </div>
 
         <div className="mb-4 flex gap-2">
-          <Button variant="outline" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
           <Button variant="outline" size="icon">
             <RefreshCw className="h-4 w-4" />
           </Button>

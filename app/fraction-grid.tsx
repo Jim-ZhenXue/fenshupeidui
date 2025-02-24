@@ -34,24 +34,24 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-5 gap-1 border border-gray-200 p-1 w-1/3">
+    <div className="grid grid-cols-5 gap-1 border border-gray-700 p-1 w-1/3 bg-gray-900">
       {fractions.map((fraction, index) => (
         <div
           key={index}
-          className="aspect-square border border-gray-300 p-1 cursor-move text-[0.6rem]"
+          className="aspect-square border border-gray-700 p-1 cursor-move text-[0.6rem] bg-gray-800"
           draggable
           onDragStart={(e) => handleDragStart(e, fraction)}
         >
           {fraction.type === "numeric" ? (
-            <div className="flex h-full items-center justify-center text-xl">{fraction.value}</div>
+            <div className="flex h-full items-center justify-center text-xl text-white">{fraction.value}</div>
           ) : fraction.type === "block" && fraction.parts ? (
             <div className="grid h-full" style={{ gridTemplateColumns: `repeat(${fraction.parts}, 1fr)` }}>
               {Array.from({ length: fraction.parts }).map((_, i) => (
-                <div key={i} className={`border border-gray-300 ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
+                <div key={i} className={`border border-gray-700 ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
               ))}
             </div>
           ) : (
-            <div className="relative h-full w-full rounded-full border border-gray-300">
+            <div className="relative h-full w-full rounded-full border border-gray-700">
               <div
                 className={`absolute h-full w-full rounded-full ${fraction.color}`}
                 style={{

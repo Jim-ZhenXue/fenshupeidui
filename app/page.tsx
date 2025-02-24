@@ -37,9 +37,9 @@ export default function FractionMatcher() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-black p-4">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between text-white">
           <div className="text-xl font-bold">My Matches</div>
           <div className="text-right">
             <div className="text-lg font-semibold">Level: {level}</div>

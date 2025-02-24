@@ -34,7 +34,7 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-5 gap-1 border border-gray-700 p-1 w-1/3 bg-gray-900">
+    <div className="w-full grid grid-cols-2 gap-1 border border-gray-700 p-1 bg-gray-900">
       {fractions.map((fraction, index) => (
         <div
           key={index}

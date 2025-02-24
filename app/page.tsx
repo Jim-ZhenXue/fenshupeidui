@@ -37,7 +37,7 @@ export default function FractionMatcher() {
   }
 
   return (
-    <div className="min-h-screen bg-black p-4">
+    <div className="h-screen overflow-hidden bg-black p-4">
       <div className="w-[800px] mx-auto flex gap-2">
         {/* 左侧区域 */}
         <div className="w-[150px] flex flex-col items-center">

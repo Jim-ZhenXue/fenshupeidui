@@ -38,10 +38,10 @@ export default function FractionMatcher() {
 
   return (
     <div className="min-h-screen bg-black p-4">
-      <div className="w-[1200px] mx-auto flex gap-8">
+      <div className="w-[1000px] mx-auto flex gap-4">
         {/* 左侧区域 */}
-        <div className="w-[200px] text-white">
-          <div className="text-xl font-bold mb-4">配对</div>
+        <div className="w-[180px] flex flex-col items-center">
+          <div className="text-xl font-bold text-white mb-4">配对</div>
           <FractionDisplay numerator={currentFraction.numerator} denominator={currentFraction.denominator} />
         </div>
 
@@ -57,7 +57,7 @@ export default function FractionMatcher() {
         </div>
 
         {/* 右侧区域 */}
-        <div className="w-[200px] flex flex-col items-end">
+        <div className="w-[180px] flex flex-col items-center">
           <div className="w-8 h-8 flex items-center justify-center mb-4">
             <RefreshCw className="h-4 w-4 text-white" />
           </div>

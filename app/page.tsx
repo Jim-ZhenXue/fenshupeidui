@@ -38,7 +38,7 @@ export default function FractionMatcher() {
 
   return (
     <div className="min-h-screen bg-black p-4">
-      <div className="mx-auto max-w-4xl">
+      <div className="w-[800px] mx-auto">
         <div className="mb-4 flex items-center justify-between text-white">
           <div className="text-xl font-bold">配对</div>
           <div className="text-lg font-semibold absolute left-1/2 -translate-x-1/2">Score: {score}</div>
@@ -47,7 +47,7 @@ export default function FractionMatcher() {
           </div>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-8 flex justify-center">
           <FractionDisplay numerator={currentFraction.numerator} denominator={currentFraction.denominator} />
         </div>
 
@@ -60,7 +60,9 @@ export default function FractionMatcher() {
           />
         </div>
 
-        <FractionGrid onMatch={(matched) => setScore(score + 1)} />
+        <div className="flex justify-center">
+          <FractionGrid onMatch={(matched) => setScore(score + 1)} />
+        </div>
       </div>
     </div>
   )

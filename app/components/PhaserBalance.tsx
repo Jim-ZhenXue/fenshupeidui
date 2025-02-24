@@ -20,32 +20,32 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
       parent: parentRef.current,
-      width: 600,
+      width: 500,
       height: 300,
       backgroundColor: '#ffffff',
       scene: {
         create: function(this: Phaser.Scene) {
           // 创建底座
-          this.add.rectangle(300, 280, 200, 20, 0x2d3748)
+          this.add.rectangle(250, 280, 200, 20, 0x2d3748)
           
           // 创建支柱
-          this.add.rectangle(300, 182.5, 20, 215, 0x4a5568)
+          this.add.rectangle(250, 182.5, 20, 215, 0x4a5568)
           
           // 创建支柱尖头
-          const pillarTip = this.add.triangle(300, 65, 0, 20, 10, 0, 20, 20, 0x4a5568)
+          const pillarTip = this.add.triangle(250, 65, 0, 20, 10, 0, 20, 20, 0x4a5568)
           
           // 创建横梁组
-          const beam = this.add.container(300, 100)
+          const beam = this.add.container(250, 100)
           
           // 创建横梁主体
           const beamRect = this.add.rectangle(0, 0, 400, 10, 0x4a5568)
           
           // 创建左盒子
-          const leftBox = this.add.rectangle(110, 152, 60, 60, 0xffffff)
+          const leftBox = this.add.rectangle(60, 152, 60, 60, 0xffffff)
           leftBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建右盒子
-          const rightBox = this.add.rectangle(490, 152, 60, 60, 0xffffff)
+          const rightBox = this.add.rectangle(440, 152, 60, 60, 0xffffff)
           rightBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建左边吊线

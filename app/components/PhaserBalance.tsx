@@ -72,14 +72,14 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             leftLine.lineStyle(2, 0x4a5568)
             leftLine.beginPath()
             leftLine.moveTo(leftWorldPoint.x, leftWorldPoint.y)
-            leftLine.lineTo(leftWorldPoint.x, leftWorldPoint.y + 52 - boxHalfHeight)  // 减去盒子高度的一半
+            leftLine.lineTo(leftWorldPoint.x, leftWorldPoint.y + 52 - boxHalfHeight)
             leftLine.strokePath()
             
             rightLine.clear()
             rightLine.lineStyle(2, 0x4a5568)
             rightLine.beginPath()
             rightLine.moveTo(rightWorldPoint.x, rightWorldPoint.y)
-            rightLine.lineTo(rightWorldPoint.x, rightWorldPoint.y + 52 - boxHalfHeight)  // 减去盒子高度的一半
+            rightLine.lineTo(rightWorldPoint.x, rightWorldPoint.y + 52 - boxHalfHeight)
             rightLine.strokePath()
             
             // 更新盒子位置
@@ -90,12 +90,29 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           beam.add([beamRect])
           
           // 添加交互
-          leftBox.setInteractive()
-          rightBox.setInteractive()
+          leftBox.setInteractive({ draggable: true })
+          rightBox.setInteractive({ draggable: true })
           
-          this.input.setDraggable(leftBox)
-          this.input.setDraggable(rightBox)
-          
+          // 拖动开始事件
+          this.input.on('dragstart', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Rectangle) => {
+            gameObject.setTint(0xaaaaaa)
+          })
+
+          // 拖动中事件
+          this.input.on('drag', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Rectangle, dragX: number, dragY: number) => {
+            gameObject.x = dragX
+            gameObject.y = dragY
+          })
+
+          // 拖动结束事件
+          this.input.on('dragend', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Rectangle) => {
+            gameObject.clearTint()
+            const dropZone = gameObject === leftBox ? onLeftDrop : onRightDrop
+            const item = gameObject === leftBox ? leftItem : rightItem
+            dropZone(item)
+            updateLines()
+          })
+
           // 添加动画效果
           this.tweens.add({
             targets: beam,

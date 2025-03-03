@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import type { DragEvent } from "react"
 
 interface FractionType {
+  id?: string;
   type: "numeric" | "block" | "circle"
   value?: string
   color?: string
@@ -12,25 +13,44 @@ interface FractionType {
   percentage?: number
 }
 
+interface GridItem {
+  fraction: FractionType | null;
+  id: string;
+}
+
 interface FractionGridProps {
   onMatch: (matched: boolean) => void
 }
 
 export default function FractionGrid({ onMatch }: FractionGridProps) {
-  const fractions: FractionType[] = [
-    { type: "numeric", value: "2/3" },
-    { type: "block", color: "bg-sky-400", parts: 3, filled: 2 },
-    { type: "block", color: "bg-green-400", parts: 3, filled: 1 },
-    { type: "block", color: "bg-red-400", parts: 2, filled: 1 },
-    { type: "numeric", value: "1/1" },
-    { type: "block", color: "bg-green-400", parts: 4, filled: 3 },
-    { type: "block", color: "bg-red-400", parts: 3, filled: 1 },
-    { type: "circle", color: "bg-sky-400", percentage: 50 },
-    { type: "block", color: "bg-green-400", parts: 1, filled: 1 },
-    { type: "block", color: "bg-sky-400", parts: 3, filled: 2 },
+  const initialFractions: FractionType[] = [
+    { id: "f1", type: "numeric", value: "2/3" },
+    { id: "f2", type: "block", color: "bg-sky-400", parts: 3, filled: 2 },
+    { id: "f3", type: "block", color: "bg-green-400", parts: 3, filled: 1 },
+    { id: "f4", type: "block", color: "bg-red-400", parts: 2, filled: 1 },
+    { id: "f5", type: "numeric", value: "1/1" },
+    { id: "f6", type: "block", color: "bg-green-400", parts: 4, filled: 3 },
+    { id: "f7", type: "block", color: "bg-red-400", parts: 3, filled: 1 },
+    { id: "f8", type: "circle", color: "bg-sky-400", percentage: 50 },
+    { id: "f9", type: "block", color: "bg-green-400", parts: 1, filled: 1 },
+    { id: "f10", type: "block", color: "bg-sky-400", parts: 3, filled: 2 },
   ]
+  
+  // 创建一个固定的网格，每个位置可以有分数或为空
+  const [gridItems, setGridItems] = useState<GridItem[]>(
+    initialFractions.map((fraction, index) => ({
+      fraction,
+      id: `grid-${index}`
+    }))
+  );
+  
+  const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
 
-  const handleDragStart = (e: DragEvent | React.TouchEvent, fraction: FractionType) => {
+  const handleDragStart = (e: DragEvent | React.TouchEvent, fraction: FractionType, gridItemId: string) => {
+    if (fraction) {
+      setDraggedItemId(gridItemId);
+    }
+    
     if ('dataTransfer' in e) {
       // Mouse drag event
       e.dataTransfer.setData("text/plain", JSON.stringify(fraction))
@@ -80,10 +100,38 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
           }
         })
         dropTarget.dispatchEvent(event)
+        
+        // 如果拖放到天平上，将该位置设为空
+        if (draggedItemId) {
+          setGridItems(items => 
+            items.map(item => 
+              item.id === draggedItemId 
+                ? { ...item, fraction: null } 
+                : item
+            )
+          );
+          setDraggedItemId(null);
+        }
       }
       
       clone.remove()
       delete (window as any).dragData
+    }
+  }
+  
+  // 处理拖放结束事件
+  const handleDragEnd = (e: DragEvent) => {
+    // 检查是否成功放置
+    if (e.dataTransfer.dropEffect === 'move' && draggedItemId) {
+      // 将该位置设为空，而不是移除
+      setGridItems(items => 
+        items.map(item => 
+          item.id === draggedItemId 
+            ? { ...item, fraction: null } 
+            : item
+        )
+      );
+      setDraggedItemId(null);
     }
   }
 
@@ -91,43 +139,69 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     document.addEventListener('touchmove', handleTouchMove)
     document.addEventListener('touchend', handleTouchEnd)
     
+    // 监听自定义事件，当天平接收到拖放时触发
+    const handleBalanceDrop = () => {
+      if (draggedItemId) {
+        setGridItems(items => 
+          items.map(item => 
+            item.id === draggedItemId 
+              ? { ...item, fraction: null } 
+              : item
+          )
+        );
+        setDraggedItemId(null);
+      }
+    };
+    
+    window.addEventListener('balance-drop', handleBalanceDrop);
+    
     return () => {
       document.removeEventListener('touchmove', handleTouchMove)
       document.removeEventListener('touchend', handleTouchEnd)
+      window.removeEventListener('balance-drop', handleBalanceDrop);
     }
-  }, [])
+  }, [draggedItemId]);
 
   return (
     <div className="w-full grid grid-cols-2 gap-1 border border-gray-700 p-1 bg-gray-900">
-      {fractions.map((fraction, index) => (
+      {gridItems.map((gridItem) => (
         <div
-          key={index}
-          className="aspect-square border border-gray-700 p-1 cursor-move text-[0.6rem] bg-gray-800"
-          draggable
-          onDragStart={(e) => handleDragStart(e, fraction)}
-          onTouchStart={(e) => handleDragStart(e, fraction)}
+          key={gridItem.id}
+          className="aspect-square border border-gray-700 p-1 bg-gray-800"
         >
-          {fraction.type === "numeric" ? (
-            <div className="flex h-full items-center justify-center text-xl text-white">{fraction.value}</div>
-          ) : fraction.type === "block" && fraction.parts ? (
-            <div className="grid h-full" style={{ gridTemplateColumns: `repeat(${fraction.parts}, 1fr)` }}>
-              {Array.from({ length: fraction.parts }).map((_, i) => (
-                <div key={i} className={`border border-gray-700 ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
-              ))}
+          {gridItem.fraction ? (
+            <div 
+              className="w-full h-full cursor-move"
+              draggable
+              onDragStart={(e) => handleDragStart(e, gridItem.fraction!, gridItem.id)}
+              onDragEnd={handleDragEnd}
+              onTouchStart={(e) => handleDragStart(e, gridItem.fraction!, gridItem.id)}
+            >
+              {gridItem.fraction.type === "numeric" ? (
+                <div className="flex h-full items-center justify-center text-xl text-white">{gridItem.fraction.value}</div>
+              ) : gridItem.fraction.type === "block" && gridItem.fraction.parts ? (
+                <div className="grid h-full" style={{ gridTemplateColumns: `repeat(${gridItem.fraction.parts}, 1fr)` }}>
+                  {Array.from({ length: gridItem.fraction.parts }).map((_, i) => (
+                    <div key={i} className={`border border-gray-700 ${i < (gridItem.fraction.filled || 0) ? gridItem.fraction.color : ""}`} />
+                  ))}
+                </div>
+              ) : (
+                <div className="relative h-full w-full rounded-full border border-gray-700">
+                  <div
+                    className={`absolute h-full w-full rounded-full ${gridItem.fraction.color}`}
+                    style={{
+                      clipPath: `polygon(0 0, 100% 0, 100% ${gridItem.fraction.percentage}%, 0 ${gridItem.fraction.percentage}%)`,
+                    }}
+                  />
+                </div>
+              )}
             </div>
           ) : (
-            <div className="relative h-full w-full rounded-full border border-gray-700">
-              <div
-                className={`absolute h-full w-full rounded-full ${fraction.color}`}
-                style={{
-                  clipPath: `polygon(0 0, 100% 0, 100% ${fraction.percentage}%, 0 ${fraction.percentage}%)`,
-                }}
-              />
-            </div>
+            // 空白单元格
+            <div className="w-full h-full"></div>
           )}
         </div>
       ))}
     </div>
   )
 }
-

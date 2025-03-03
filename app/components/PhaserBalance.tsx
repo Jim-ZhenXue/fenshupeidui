@@ -31,6 +31,21 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
       },
       scene: {
         create: function(this: Phaser.Scene) {
+          // 颜色转换辅助函数
+          this.getColorFromTailwind = (tailwindColor: string) => {
+            const colorMap: Record<string, number> = {
+              'bg-red-400': 0xfc8181,
+              'bg-green-400': 0x68d391,
+              'bg-sky-400': 0x38bdf8,
+              'bg-blue-400': 0x63b3ed,
+              'bg-yellow-400': 0xf6e05e,
+              'bg-purple-400': 0xb794f4,
+              'bg-pink-400': 0xf687b3,
+              'bg-gray-400': 0xcbd5e0
+            }
+            return colorMap[tailwindColor] || 0x38bdf8 // 默认蓝色
+          }
+          
           // 创建底座
           this.add.rectangle(250, 280, 200, 20, 0x2d3748)
           
@@ -47,11 +62,11 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           const beamRect = this.add.rectangle(0, 0, 400, 10, 0x4a5568)
           
           // 创建左盒子
-          const leftBox = this.add.rectangle(60, 152, 60, 60, 0xffffff)
+          const leftBox = this.add.rectangle(60, 152, 78, 78, 0xffffff)
           leftBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建右盒子
-          const rightBox = this.add.rectangle(440, 152, 60, 60, 0xffffff)
+          const rightBox = this.add.rectangle(440, 152, 78, 78, 0xffffff)
           rightBox.setStrokeStyle(4, 0x4a5568)
           
           // 创建左边吊线
@@ -71,7 +86,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             const rightWorldPoint = rotationMatrix.transformPoint(rightBeamPoint.x, rightBeamPoint.y)
             
             // 盒子高度的一半（用于计算吊线终点）
-            const boxHalfHeight = 30  // 60/2
+            const boxHalfHeight = 39  // 78/2
             
             // 清除并重绘吊线
             leftLine.clear()
@@ -91,6 +106,10 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             // 更新盒子位置
             leftBox.setPosition(leftWorldPoint.x, leftWorldPoint.y + 52)
             rightBox.setPosition(rightWorldPoint.x, rightWorldPoint.y + 52)
+            
+            // 更新分数容器位置到盒子中心
+            leftFractionContainer.setPosition(leftWorldPoint.x, leftWorldPoint.y + 52)
+            rightFractionContainer.setPosition(rightWorldPoint.x, rightWorldPoint.y + 52)
           }
           
           beam.add([beamRect])
@@ -98,6 +117,112 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           // 添加交互
           leftBox.setInteractive()
           rightBox.setInteractive()
+          
+          // 创建分数图形容器
+          const leftFractionContainer = this.add.container(0, 0)
+          const rightFractionContainer = this.add.container(0, 0)
+          
+          // 更新盒子内容函数
+          const updateBoxContents = () => {
+            // 清空容器
+            leftFractionContainer.removeAll(true)
+            rightFractionContainer.removeAll(true)
+            
+            // 获取盒子的世界坐标
+            const leftBoxPos = leftBox.getCenter()
+            const rightBoxPos = rightBox.getCenter()
+            
+            // 更新容器位置到盒子中心
+            leftFractionContainer.setPosition(leftBoxPos.x, leftBoxPos.y)
+            rightFractionContainer.setPosition(rightBoxPos.x, rightBoxPos.y)
+            
+            // 如果有左侧物品，创建其图形表示
+            if (leftItem) {
+              if (leftItem.type === "numeric" && leftItem.value) {
+                // 数字分数
+                const text = this.add.text(0, 0, leftItem.value, { 
+                  font: '20px Arial', 
+                  color: '#000000',
+                  align: 'center'
+                }).setOrigin(0.5)
+                leftFractionContainer.add(text)
+              } else if (leftItem.type === "block" && leftItem.parts) {
+                // 方块分数
+                const blockWidth = 60 / leftItem.parts
+                const blockHeight = 60
+                const startX = -(blockWidth * leftItem.parts) / 2 + blockWidth / 2
+                
+                for (let i = 0; i < leftItem.parts; i++) {
+                  const block = this.add.rectangle(
+                    startX + i * blockWidth, 
+                    0, 
+                    blockWidth - 2, 
+                    blockHeight - 2, 
+                    i < leftItem.filled ? this.getColorFromTailwind(leftItem.color) : 0xffffff
+                  )
+                  block.setStrokeStyle(1, 0x000000)
+                  leftFractionContainer.add(block)
+                }
+              } else if (leftItem.type === "circle" && leftItem.percentage) {
+                // 圆形分数
+                const circle = this.add.circle(0, 0, 30, 0xffffff)
+                circle.setStrokeStyle(1, 0x000000)
+                leftFractionContainer.add(circle)
+                
+                // 创建扇形填充
+                const pie = this.add.graphics()
+                pie.fillStyle(this.getColorFromTailwind(leftItem.color), 1)
+                pie.slice(0, 0, 30, 0, (leftItem.percentage / 100) * Math.PI * 2, true)
+                pie.fillPath()
+                leftFractionContainer.add(pie)
+              }
+            }
+            
+            // 如果有右侧物品，创建其图形表示
+            if (rightItem) {
+              if (rightItem.type === "numeric" && rightItem.value) {
+                // 数字分数
+                const text = this.add.text(0, 0, rightItem.value, { 
+                  font: '20px Arial', 
+                  color: '#000000',
+                  align: 'center'
+                }).setOrigin(0.5)
+                rightFractionContainer.add(text)
+              } else if (rightItem.type === "block" && rightItem.parts) {
+                // 方块分数
+                const blockWidth = 60 / rightItem.parts
+                const blockHeight = 60
+                const startX = -(blockWidth * rightItem.parts) / 2 + blockWidth / 2
+                
+                for (let i = 0; i < rightItem.parts; i++) {
+                  const block = this.add.rectangle(
+                    startX + i * blockWidth, 
+                    0, 
+                    blockWidth - 2, 
+                    blockHeight - 2, 
+                    i < rightItem.filled ? this.getColorFromTailwind(rightItem.color) : 0xffffff
+                  )
+                  block.setStrokeStyle(1, 0x000000)
+                  rightFractionContainer.add(block)
+                }
+              } else if (rightItem.type === "circle" && rightItem.percentage) {
+                // 圆形分数
+                const circle = this.add.circle(0, 0, 30, 0xffffff)
+                circle.setStrokeStyle(1, 0x000000)
+                rightFractionContainer.add(circle)
+                
+                // 创建扇形填充
+                const pie = this.add.graphics()
+                pie.fillStyle(this.getColorFromTailwind(rightItem.color), 1)
+                pie.slice(0, 0, 30, 0, (rightItem.percentage / 100) * Math.PI * 2, true)
+                pie.fillPath()
+                rightFractionContainer.add(pie)
+              }
+            }
+          }
+          
+          // 初始更新内容
+          updateBoxContents()
           
           let dragTarget: Phaser.GameObjects.Rectangle | null = null
           
@@ -145,6 +270,43 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           
           // 初始化吊线位置
           updateLines()
+          
+          // 监听外部更新
+          this.events.on('update-contents', updateBoxContents)
+          
+          // 当有新的物品放入时更新动画
+          this.events.on('update-balance', () => {
+            // 更新容器位置到盒子中心
+            const leftBoxPos = leftBox.getCenter()
+            const rightBoxPos = rightBox.getCenter()
+            leftFractionContainer.setPosition(leftBoxPos.x, leftBoxPos.y)
+            rightFractionContainer.setPosition(rightBoxPos.x, rightBoxPos.y)
+            
+            this.tweens.add({
+              targets: beam,
+              angle: leftItem && !rightItem ? -5 : rightItem && !leftItem ? 5 : 0,
+              duration: 500,
+              ease: 'Power2',
+              onUpdate: () => {
+                updateLines()
+                
+                // 在每一帧更新时确保分数图形保持在盒子中心
+                const leftBoxPos = leftBox.getCenter()
+                const rightBoxPos = rightBox.getCenter()
+                leftFractionContainer.setPosition(leftBoxPos.x, leftBoxPos.y)
+                rightFractionContainer.setPosition(rightBoxPos.x, rightBoxPos.y)
+              },
+              onComplete: () => {
+                // 动画完成后再次确保分数图形在盒子中心
+                const leftBoxPos = leftBox.getCenter()
+                const rightBoxPos = rightBox.getCenter()
+                leftFractionContainer.setPosition(leftBoxPos.x, leftBoxPos.y)
+                rightFractionContainer.setPosition(rightBoxPos.x, rightBoxPos.y)
+                
+                updateBoxContents()
+              }
+            })
+          })
         }
       }
     }
@@ -162,31 +324,75 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
       }
     }
 
+    // 存储当前拖拽的数据
+    let currentDragData: any = null
+
+    // 添加拖拽数据存储和获取的事件处理
+    const handleDragStart = (e: DragEvent) => {
+      try {
+        currentDragData = JSON.parse(e.dataTransfer.getData('text/plain'))
+      } catch (err) {
+        console.error('Failed to parse drag data:', err)
+      }
+    }
+
+    const handleGetDragData = (e: CustomEvent) => {
+      if (e.detail && e.detail.callback && typeof e.detail.callback === 'function') {
+        e.detail.callback(currentDragData)
+        currentDragData = null
+      }
+    }
+
     parentRef.current.addEventListener('custom-drop', handleCustomDrop as EventListener)
+    window.addEventListener('dragstart', handleDragStart)
+    window.addEventListener('get-drag-data', handleGetDragData as EventListener)
 
     return () => {
       if (gameRef.current) {
         gameRef.current.destroy(true)
       }
       parentRef.current?.removeEventListener('custom-drop', handleCustomDrop as EventListener)
+      window.removeEventListener('dragstart', handleDragStart)
+      window.removeEventListener('get-drag-data', handleGetDragData as EventListener)
     }
   }, [leftItem, rightItem])
+
+  useEffect(() => {
+    // 当leftItem或rightItem变化时，通知Phaser场景更新
+    if (gameRef.current) {
+      const scene = gameRef.current.scene.getScene('default');
+      if (scene) {
+        scene.events.emit('update-contents');
+        scene.events.emit('update-balance');
+      }
+    }
+  }, [leftItem, rightItem]);
 
   return (
     <div 
       ref={parentRef} 
       className="w-full h-[300px] phaser-balance"
-      onDragOver={(e) => e.preventDefault()}
+      onDragOver={(e) => {
+        e.preventDefault()
+        e.dataTransfer.dropEffect = 'move'
+      }}
       onDrop={(e) => {
         e.preventDefault()
-        const data = JSON.parse(e.dataTransfer.getData('text/plain'))
-        const rect = e.currentTarget.getBoundingClientRect()
-        const x = e.clientX - rect.left
-        
-        if (x < rect.width / 2) {
-          onLeftDrop(data)
-        } else {
-          onRightDrop(data)
+        try {
+          const data = JSON.parse(e.dataTransfer.getData('text/plain'))
+          const rect = e.currentTarget.getBoundingClientRect()
+          const x = e.clientX - rect.left
+          
+          if (x < rect.width / 2) {
+            onLeftDrop(data)
+          } else {
+            onRightDrop(data)
+          }
+          
+          // 触发自定义事件，通知分数网格移除该项
+          window.dispatchEvent(new CustomEvent('balance-drop'))
+        } catch (err) {
+          console.error('Error handling drop:', err)
         }
       }}
     />

@@ -4,13 +4,11 @@ import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { RefreshCw, Check } from "lucide-react"
 import FractionGrid from "./fraction-grid"
-import FractionDisplay from "./fraction-display"
 import Balance from "./balance"
 
 export default function FractionMatcher() {
   const [score, setScore] = useState(0)
   const [level, setLevel] = useState(1)
-  const [currentFraction, setCurrentFraction] = useState({ numerator: 1, denominator: 4 })
   const [leftBalance, setLeftBalance] = useState<any>(null)
   const [rightBalance, setRightBalance] = useState<any>(null)
   const [showCheckButton, setShowCheckButton] = useState(false)
@@ -150,7 +148,6 @@ export default function FractionMatcher() {
               <RefreshCw className="h-4 w-4 text-white" />
             </div>
           </div>
-          <FractionDisplay numerator={currentFraction.numerator} denominator={currentFraction.denominator} />
           
           {/* 正确配对列表 */}
           <div className="mt-4 w-full">

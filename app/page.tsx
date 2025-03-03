@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { RefreshCw, Check } from "lucide-react"
+import { RefreshCw } from "lucide-react"
 import FractionGrid from "./fraction-grid"
 import Balance from "./balance"
 
@@ -14,7 +14,10 @@ export default function FractionMatcher() {
   const [showCheckButton, setShowCheckButton] = useState(false)
   const [checkButtonFlashing, setCheckButtonFlashing] = useState(false)
   const [correctPairs, setCorrectPairs] = useState<any[]>([])
+  const [feedback, setFeedback] = useState<{ message: string, isSuccess: boolean } | null>(null)
+  const [isCorrectMatch, setIsCorrectMatch] = useState(false)
   const flashingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // 检查两个分数是否相等的函数
   const areFractionsEqual = (fraction1: any, fraction2: any) => {
@@ -87,21 +90,52 @@ export default function FractionMatcher() {
       const isEqual = areFractionsEqual(leftBalance, rightBalance)
       
       if (isEqual) {
-        // 添加到正确配对列表
-        setCorrectPairs(prev => [...prev, { left: leftBalance, right: rightBalance }])
-        setScore(score + 1)
+        // 设置为正确匹配，但还不添加到列表
+        setIsCorrectMatch(true)
+        setFeedback({ message: "😊", isSuccess: true })
+        
+        // 不立即隐藏检查按钮，而是替换为笑脸和确认按钮
+        setShowCheckButton(true)
+      } else {
+        setFeedback({ message: "再试一次", isSuccess: false })
+        
+        // 重置天平
+        setLeftBalance(null)
+        setRightBalance(null)
+        setShowCheckButton(false)
+        setCheckButtonFlashing(false)
+        
+        // 设置反馈消失的定时器
+        if (feedbackTimeoutRef.current) {
+          clearTimeout(feedbackTimeoutRef.current)
+        }
+        
+        feedbackTimeoutRef.current = setTimeout(() => {
+          setFeedback(null)
+        }, 2000)
       }
-      
-      // 重置天平
-      setLeftBalance(null)
-      setRightBalance(null)
-      setShowCheckButton(false)
-      setCheckButtonFlashing(false)
       
       if (flashingIntervalRef.current) {
         clearInterval(flashingIntervalRef.current)
         flashingIntervalRef.current = null
       }
+    }
+  }
+  
+  // 处理确认按钮点击
+  const handleConfirmClick = () => {
+    if (isCorrectMatch && leftBalance && rightBalance) {
+      // 添加到正确配对列表
+      setCorrectPairs(prev => [...prev, { left: leftBalance, right: rightBalance }])
+      setScore(score + 1)
+      
+      // 重置所有状态
+      setLeftBalance(null)
+      setRightBalance(null)
+      setShowCheckButton(false)
+      setCheckButtonFlashing(false)
+      setFeedback(null)
+      setIsCorrectMatch(false)
     }
   }
   
@@ -133,6 +167,11 @@ export default function FractionMatcher() {
       if (flashingIntervalRef.current) {
         clearInterval(flashingIntervalRef.current)
         flashingIntervalRef.current = null
+      }
+      
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current)
+        feedbackTimeoutRef.current = null
       }
     }
   }, [leftBalance, rightBalance])
@@ -173,15 +212,33 @@ export default function FractionMatcher() {
           <div className="flex items-center justify-between w-full px-4 mb-4">
             <div className="text-lg font-semibold text-white">Score: {score}</div>
             
-            {/* 检查按钮 */}
+            {/* 检查按钮或笑脸+确认按钮 */}
             {showCheckButton && (
-              <Button 
-                onClick={handleCheckClick}
-                className={`bg-green-600 hover:bg-green-700 transition-all ${checkButtonFlashing ? 'animate-pulse' : ''}`}
-              >
-                <Check className="mr-1 h-4 w-4" />
-                检查
-              </Button>
+              feedback && feedback.isSuccess ? (
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl">😊</div>
+                  <Button 
+                    onClick={handleConfirmClick}
+                    className="bg-blue-600 hover:bg-blue-700 transition-all"
+                  >
+                    确认
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  onClick={handleCheckClick}
+                  className={`bg-green-600 hover:bg-green-700 transition-all ${checkButtonFlashing ? 'animate-pulse' : ''}`}
+                >
+                  检查
+                </Button>
+              )
+            )}
+            
+            {/* 失败反馈信息（只在不相等时显示） */}
+            {feedback && !feedback.isSuccess && (
+              <div className="ml-2 text-lg font-semibold text-yellow-400 transition-opacity">
+                {feedback.message}
+              </div>
             )}
           </div>
           <Balance

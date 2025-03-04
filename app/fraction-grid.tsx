@@ -33,7 +33,7 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     { id: "f7", type: "block", color: "bg-red-400", parts: 3, filled: 1 },
     { id: "f8", type: "circle", color: "bg-sky-400", percentage: 50 },
     { id: "f9", type: "block", color: "bg-green-400", parts: 1, filled: 1 },
-    { id: "f10", type: "block", color: "bg-sky-400", parts: 3, filled: 2 },
+    { id: "f10", type: "block", color: "bg-red-400", parts: 3, filled: 2 },
   ]
   
   // 创建一个固定的网格，每个位置可以有分数或为空

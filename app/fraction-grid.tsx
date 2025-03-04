@@ -178,7 +178,15 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
               onTouchStart={(e) => handleDragStart(e, gridItem.fraction!, gridItem.id)}
             >
               {gridItem.fraction.type === "numeric" ? (
-                <div className="flex h-full items-center justify-center text-xl text-white">{gridItem.fraction.value}</div>
+                <div className="flex h-full items-center justify-center">
+                  {gridItem.fraction.value && (
+                    <div className="flex flex-col items-center">
+                      <div className="text-xl text-white">{gridItem.fraction.value.split('/')[0]}</div>
+                      <div className="w-full h-[2px] bg-white"></div>
+                      <div className="text-xl text-white">{gridItem.fraction.value.split('/')[1]}</div>
+                    </div>
+                  )}
+                </div>
               ) : gridItem.fraction.type === "block" && gridItem.fraction.parts ? (
                 <div className="grid h-full" style={{ gridTemplateColumns: `repeat(${gridItem.fraction.parts}, 1fr)` }}>
                   {Array.from({ length: gridItem.fraction.parts }).map((_, i) => (

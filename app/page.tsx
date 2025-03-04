@@ -266,7 +266,13 @@ function renderMiniatureFraction(fraction: any) {
   if (!fraction) return null
   
   if (fraction.type === "numeric") {
-    return <div className="text-xs text-white">{fraction.value}</div>
+    return (
+      <div className="flex flex-col items-center">
+        <div className="text-xs text-white">{fraction.value.split('/')[0]}</div>
+        <div className="w-full h-[1px] bg-white"></div>
+        <div className="text-xs text-white">{fraction.value.split('/')[1]}</div>
+      </div>
+    )
   } else if (fraction.type === "block" && fraction.parts) {
     return (
       <div className="h-full aspect-square grid" style={{ gridTemplateColumns: `repeat(${fraction.parts}, 1fr)` }}>

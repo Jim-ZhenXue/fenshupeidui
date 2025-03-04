@@ -139,13 +139,28 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             // 如果有左侧物品，创建其图形表示
             if (leftItem) {
               if (leftItem.type === "numeric" && leftItem.value) {
-                // 数字分数
-                const text = this.add.text(0, 0, leftItem.value, { 
-                  font: '20px Arial', 
+                // 数字分数 - 使用分数线代替斜杠
+                const [numerator, denominator] = leftItem.value.split('/')
+                
+                // 创建分子
+                const numeratorText = this.add.text(0, -12, numerator, { 
+                  font: '18px Arial', 
                   color: '#000000',
                   align: 'center'
                 }).setOrigin(0.5)
-                leftFractionContainer.add(text)
+                
+                // 创建分数线
+                const line = this.add.rectangle(0, 0, 20, 2, 0x000000)
+                
+                // 创建分母
+                const denominatorText = this.add.text(0, 12, denominator, { 
+                  font: '18px Arial', 
+                  color: '#000000',
+                  align: 'center'
+                }).setOrigin(0.5)
+                
+                // 添加到容器
+                leftFractionContainer.add([numeratorText, line, denominatorText])
               } else if (leftItem.type === "block" && leftItem.parts) {
                 // 方块分数
                 const blockWidth = 60 / leftItem.parts
@@ -181,13 +196,28 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             // 如果有右侧物品，创建其图形表示
             if (rightItem) {
               if (rightItem.type === "numeric" && rightItem.value) {
-                // 数字分数
-                const text = this.add.text(0, 0, rightItem.value, { 
-                  font: '20px Arial', 
+                // 数字分数 - 使用分数线代替斜杠
+                const [numerator, denominator] = rightItem.value.split('/')
+                
+                // 创建分子
+                const numeratorText = this.add.text(0, -12, numerator, { 
+                  font: '18px Arial', 
                   color: '#000000',
                   align: 'center'
                 }).setOrigin(0.5)
-                rightFractionContainer.add(text)
+                
+                // 创建分数线
+                const line = this.add.rectangle(0, 0, 20, 2, 0x000000)
+                
+                // 创建分母
+                const denominatorText = this.add.text(0, 12, denominator, { 
+                  font: '18px Arial', 
+                  color: '#000000',
+                  align: 'center'
+                }).setOrigin(0.5)
+                
+                // 添加到容器
+                rightFractionContainer.add([numeratorText, line, denominatorText])
               } else if (rightItem.type === "block" && rightItem.parts) {
                 // 方块分数
                 const blockWidth = 60 / rightItem.parts

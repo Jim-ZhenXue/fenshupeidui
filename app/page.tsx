@@ -93,17 +93,12 @@ export default function FractionMatcher() {
         // 设置为正确匹配，但还不添加到列表
         setIsCorrectMatch(true)
         setFeedback({ message: "😊", isSuccess: true })
-        
-        // 不立即隐藏检查按钮，而是替换为笑脸和确认按钮
-        setShowCheckButton(true)
       } else {
         setFeedback({ message: "再试一次", isSuccess: false })
         
         // 重置天平
         setLeftBalance(null)
         setRightBalance(null)
-        setShowCheckButton(false)
-        setCheckButtonFlashing(false)
         
         // 设置反馈消失的定时器
         if (feedbackTimeoutRef.current) {
@@ -141,6 +136,11 @@ export default function FractionMatcher() {
   
   // 监控天平两侧的状态，决定是否显示检查按钮
   useEffect(() => {
+    // 当两侧都有分数时，清除任何"再试一次"消息
+    if (leftBalance && rightBalance && feedback && !feedback.isSuccess) {
+      setFeedback(null);
+    }
+    
     if (leftBalance && rightBalance) {
       setShowCheckButton(true)
       setCheckButtonFlashing(true)
@@ -174,7 +174,7 @@ export default function FractionMatcher() {
         feedbackTimeoutRef.current = null
       }
     }
-  }, [leftBalance, rightBalance])
+  }, [leftBalance, rightBalance, feedback])
 
   return (
     <div className="h-screen overflow-hidden bg-black p-4">
@@ -212,34 +212,33 @@ export default function FractionMatcher() {
           <div className="flex items-center justify-between w-full px-4 mb-4">
             <div className="text-lg font-semibold text-white">Score: {score}</div>
             
-            {/* 检查按钮或笑脸+确认按钮 */}
-            {showCheckButton && (
-              feedback && feedback.isSuccess ? (
-                <div className="flex items-center gap-2">
-                  <div className="text-2xl">😊</div>
-                  <Button 
-                    onClick={handleConfirmClick}
-                    className="bg-blue-600 hover:bg-blue-700 transition-all"
-                  >
-                    确认
-                  </Button>
+            {/* 检查按钮/笑脸+确认按钮/再试一次消息 - 都在同一位置显示 */}
+            <div className="flex items-center">
+              {feedback && !feedback.isSuccess ? (
+                <div className="text-lg font-semibold text-yellow-400">
+                  {feedback.message}
                 </div>
-              ) : (
-                <Button 
-                  onClick={handleCheckClick}
-                  className={`bg-green-600 hover:bg-green-700 transition-all ${checkButtonFlashing ? 'animate-pulse' : ''}`}
-                >
-                  检查
-                </Button>
-              )
-            )}
-            
-            {/* 失败反馈信息（只在不相等时显示） */}
-            {feedback && !feedback.isSuccess && (
-              <div className="ml-2 text-lg font-semibold text-yellow-400 transition-opacity">
-                {feedback.message}
-              </div>
-            )}
+              ) : showCheckButton ? (
+                feedback && feedback.isSuccess ? (
+                  <div className="flex items-center gap-2">
+                    <div className="text-2xl">😊</div>
+                    <Button 
+                      onClick={handleConfirmClick}
+                      className="bg-blue-600 hover:bg-blue-700 transition-all"
+                    >
+                      确认
+                    </Button>
+                  </div>
+                ) : (
+                  <Button 
+                    onClick={handleCheckClick}
+                    className={`bg-green-600 hover:bg-green-700 transition-all ${checkButtonFlashing ? 'animate-pulse' : ''}`}
+                  >
+                    检查
+                  </Button>
+                )
+              ) : null}
+            </div>
           </div>
           <Balance
             leftItem={leftBalance}

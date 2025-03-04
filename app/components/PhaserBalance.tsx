@@ -165,18 +165,42 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                 // 方块分数
                 const blockWidth = 60 / leftItem.parts
                 const blockHeight = 60
-                const startX = -(blockWidth * leftItem.parts) / 2 + blockWidth / 2
                 
-                for (let i = 0; i < leftItem.parts; i++) {
-                  const block = this.add.rectangle(
-                    startX + i * blockWidth, 
-                    0, 
-                    blockWidth - 2, 
-                    blockHeight - 2, 
-                    i < leftItem.filled ? this.getColorFromTailwind(leftItem.color) : 0xffffff
-                  )
-                  block.setStrokeStyle(1, 0x000000)
-                  leftFractionContainer.add(block)
+                // 判断是否应该垂直排列（f3和f10）
+                const isVertical = leftItem.id === "f3" || leftItem.id === "f10"
+                
+                if (isVertical) {
+                  // 垂直排列
+                  const blockWidth = 60
+                  const blockHeight = 60 / leftItem.parts
+                  const startY = -(blockHeight * leftItem.parts) / 2 + blockHeight / 2
+                  
+                  for (let i = 0; i < leftItem.parts; i++) {
+                    const block = this.add.rectangle(
+                      0, 
+                      startY + i * blockHeight, 
+                      blockWidth - 2, 
+                      blockHeight - 2, 
+                      i < leftItem.filled ? this.getColorFromTailwind(leftItem.color) : 0xffffff
+                    )
+                    block.setStrokeStyle(1, 0x000000)
+                    leftFractionContainer.add(block)
+                  }
+                } else {
+                  // 水平排列
+                  const startX = -(blockWidth * leftItem.parts) / 2 + blockWidth / 2
+                  
+                  for (let i = 0; i < leftItem.parts; i++) {
+                    const block = this.add.rectangle(
+                      startX + i * blockWidth, 
+                      0, 
+                      blockWidth - 2, 
+                      blockHeight - 2, 
+                      i < leftItem.filled ? this.getColorFromTailwind(leftItem.color) : 0xffffff
+                    )
+                    block.setStrokeStyle(1, 0x000000)
+                    leftFractionContainer.add(block)
+                  }
                 }
               } else if (leftItem.type === "circle" && leftItem.percentage) {
                 // 圆形分数
@@ -222,18 +246,42 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                 // 方块分数
                 const blockWidth = 60 / rightItem.parts
                 const blockHeight = 60
-                const startX = -(blockWidth * rightItem.parts) / 2 + blockWidth / 2
                 
-                for (let i = 0; i < rightItem.parts; i++) {
-                  const block = this.add.rectangle(
-                    startX + i * blockWidth, 
-                    0, 
-                    blockWidth - 2, 
-                    blockHeight - 2, 
-                    i < rightItem.filled ? this.getColorFromTailwind(rightItem.color) : 0xffffff
-                  )
-                  block.setStrokeStyle(1, 0x000000)
-                  rightFractionContainer.add(block)
+                // 判断是否应该垂直排列（f3和f10）
+                const isVertical = rightItem.id === "f3" || rightItem.id === "f10"
+                
+                if (isVertical) {
+                  // 垂直排列
+                  const blockWidth = 60
+                  const blockHeight = 60 / rightItem.parts
+                  const startY = -(blockHeight * rightItem.parts) / 2 + blockHeight / 2
+                  
+                  for (let i = 0; i < rightItem.parts; i++) {
+                    const block = this.add.rectangle(
+                      0, 
+                      startY + i * blockHeight, 
+                      blockWidth - 2, 
+                      blockHeight - 2, 
+                      i < rightItem.filled ? this.getColorFromTailwind(rightItem.color) : 0xffffff
+                    )
+                    block.setStrokeStyle(1, 0x000000)
+                    rightFractionContainer.add(block)
+                  }
+                } else {
+                  // 水平排列
+                  const startX = -(blockWidth * rightItem.parts) / 2 + blockWidth / 2
+                  
+                  for (let i = 0; i < rightItem.parts; i++) {
+                    const block = this.add.rectangle(
+                      startX + i * blockWidth, 
+                      0, 
+                      blockWidth - 2, 
+                      blockHeight - 2, 
+                      i < rightItem.filled ? this.getColorFromTailwind(rightItem.color) : 0xffffff
+                    )
+                    block.setStrokeStyle(1, 0x000000)
+                    rightFractionContainer.add(block)
+                  }
                 }
               } else if (rightItem.type === "circle" && rightItem.percentage) {
                 // 圆形分数

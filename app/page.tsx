@@ -194,12 +194,16 @@ export default function FractionMatcher() {
             <div className="space-y-2 max-h-[150px] overflow-y-auto">
               {correctPairs.map((pair, index) => (
                 <div key={index} className="flex items-center justify-between bg-gray-800 p-1 rounded">
-                  <div className="w-[45%] h-8 flex items-center justify-center">
-                    {renderMiniatureFraction(pair.left)}
+                  <div className="w-[45%] flex items-center justify-center">
+                    <div className="w-1/2 aspect-square">
+                      {renderMiniatureFraction(pair.left)}
+                    </div>
                   </div>
                   <div className="text-white">=</div>
-                  <div className="w-[45%] h-8 flex items-center justify-center">
-                    {renderMiniatureFraction(pair.right)}
+                  <div className="w-[45%] flex items-center justify-center">
+                    <div className="w-1/2 aspect-square">
+                      {renderMiniatureFraction(pair.right)}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -265,7 +269,7 @@ function renderMiniatureFraction(fraction: any) {
     return <div className="text-xs text-white">{fraction.value}</div>
   } else if (fraction.type === "block" && fraction.parts) {
     return (
-      <div className="grid h-full w-full" style={{ gridTemplateColumns: `repeat(${fraction.parts}, 1fr)` }}>
+      <div className="h-full aspect-square grid" style={{ gridTemplateColumns: `repeat(${fraction.parts}, 1fr)` }}>
         {Array.from({ length: fraction.parts }).map((_, i) => (
           <div key={i} className={`border border-gray-700 ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
         ))}
@@ -273,7 +277,7 @@ function renderMiniatureFraction(fraction: any) {
     )
   } else if (fraction.type === "circle") {
     return (
-      <div className="relative h-full w-full rounded-full border border-gray-700">
+      <div className="h-full aspect-square relative rounded-full border border-gray-700">
         <div
           className={`absolute h-full w-full rounded-full ${fraction.color}`}
           style={{

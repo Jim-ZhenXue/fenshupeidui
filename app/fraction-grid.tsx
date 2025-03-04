@@ -24,7 +24,7 @@ interface FractionGridProps {
 
 export default function FractionGrid({ onMatch }: FractionGridProps) {
   const initialFractions: FractionType[] = [
-    { id: "f1", type: "numeric", value: "2/3" },
+    { id: "f1", type: "numeric", value: "3/4" },
     { id: "f2", type: "block", color: "bg-sky-400", parts: 3, filled: 2 },
     { id: "f3", type: "block", color: "bg-green-400", parts: 3, filled: 1 },
     { id: "f4", type: "block", color: "bg-red-400", parts: 2, filled: 1 },
@@ -188,9 +188,14 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
                   )}
                 </div>
               ) : gridItem.fraction.type === "block" && gridItem.fraction.parts ? (
-                <div className="grid h-full" style={{ gridTemplateColumns: `repeat(${gridItem.fraction.parts}, 1fr)` }}>
+                <div className={`h-full ${gridItem.fraction.id === "f3" || gridItem.fraction.id === "f10" ? "flex flex-col" : "grid"}`} style={{ 
+                  ...(gridItem.fraction.id !== "f3" && gridItem.fraction.id !== "f10" ? { gridTemplateColumns: `repeat(${gridItem.fraction.parts}, 1fr)` } : {})
+                }}>
                   {Array.from({ length: gridItem.fraction.parts }).map((_, i) => (
-                    <div key={i} className={`border border-gray-700 ${i < (gridItem.fraction.filled || 0) ? gridItem.fraction.color : ""}`} />
+                    <div 
+                      key={i} 
+                      className={`border border-gray-700 ${i < (gridItem.fraction.filled || 0) ? gridItem.fraction.color : ""} ${gridItem.fraction.id === "f3" || gridItem.fraction.id === "f10" ? "flex-1" : ""}`} 
+                    />
                   ))}
                 </div>
               ) : (

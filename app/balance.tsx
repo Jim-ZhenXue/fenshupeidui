@@ -15,7 +15,7 @@ interface BalanceProps {
 
 export default function Balance({ leftItem, rightItem, onLeftDrop, onRightDrop }: BalanceProps) {
   return (
-    <div className="w-full">
+    <div className="w-full bg-black">
       <PhaserBalance
         leftItem={leftItem}
         rightItem={rightItem}

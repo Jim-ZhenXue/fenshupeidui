@@ -281,7 +281,7 @@ function renderMiniatureFraction(fraction: any) {
       return (
         <div className="h-full aspect-square grid" style={{ gridTemplateRows: `repeat(${fraction.parts}, 1fr)` }}>
           {Array.from({ length: fraction.parts }).map((_, i) => (
-            <div key={i} className={`border border-gray-700 ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
+            <div key={i} className={`border border-white ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
           ))}
         </div>
       )
@@ -289,14 +289,14 @@ function renderMiniatureFraction(fraction: any) {
       return (
         <div className="h-full aspect-square grid" style={{ gridTemplateColumns: `repeat(${fraction.parts}, 1fr)` }}>
           {Array.from({ length: fraction.parts }).map((_, i) => (
-            <div key={i} className={`border border-gray-700 ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
+            <div key={i} className={`border border-white ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
           ))}
         </div>
       )
     }
   } else if (fraction.type === "circle") {
     return (
-      <div className="h-full aspect-square relative rounded-full border border-gray-700">
+      <div className="h-full aspect-square relative rounded-full border border-white">
         <div
           className={`absolute h-full w-full rounded-full ${fraction.color}`}
           style={{

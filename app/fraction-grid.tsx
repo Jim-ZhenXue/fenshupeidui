@@ -194,12 +194,12 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
                   {Array.from({ length: gridItem.fraction.parts }).map((_, i) => (
                     <div 
                       key={i} 
-                      className={`border border-gray-700 ${i < (gridItem.fraction.filled || 0) ? gridItem.fraction.color : ""} ${gridItem.fraction.id === "f3" || gridItem.fraction.id === "f10" ? "flex-1" : ""}`} 
+                      className={`border border-white ${i < (gridItem.fraction.filled || 0) ? gridItem.fraction.color : ""} ${gridItem.fraction.id === "f3" || gridItem.fraction.id === "f10" ? "flex-1" : ""}`} 
                     />
                   ))}
                 </div>
               ) : (
-                <div className="relative h-full w-full rounded-full border border-gray-700">
+                <div className="relative h-full w-full rounded-full border border-white">
                   <div
                     className={`absolute h-full w-full rounded-full ${gridItem.fraction.color}`}
                     style={{

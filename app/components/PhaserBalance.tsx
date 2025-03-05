@@ -22,7 +22,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
       parent: parentRef.current,
       width: 500,
       height: 300,
-      backgroundColor: '#ffffff',
+      backgroundColor: '#000000',
       input: {
         activePointers: 2,
         touch: {
@@ -47,27 +47,27 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           }
           
           // 创建底座
-          this.add.rectangle(250, 280, 200, 20, 0x2d3748)
+          this.add.rectangle(250, 280, 200, 20, 0xffffff)
           
           // 创建支柱
-          this.add.rectangle(250, 182.5, 20, 215, 0x4a5568)
+          this.add.rectangle(250, 182.5, 20, 215, 0xffffff)
           
           // 创建支柱尖头
-          const pillarTip = this.add.triangle(250, 65, 0, 20, 10, 0, 20, 20, 0x4a5568)
+          const pillarTip = this.add.triangle(250, 65, 0, 20, 10, 0, 20, 20, 0xffffff)
           
           // 创建横梁组
           const beam = this.add.container(250, 100)
           
           // 创建横梁主体
-          const beamRect = this.add.rectangle(0, 0, 400, 10, 0x4a5568)
+          const beamRect = this.add.rectangle(0, 0, 400, 10, 0xffffff)
           
           // 创建左盒子
-          const leftBox = this.add.rectangle(60, 152, 78, 78, 0xffffff)
-          leftBox.setStrokeStyle(4, 0x4a5568)
+          const leftBox = this.add.rectangle(60, 152, 78, 78, 0x000000)
+          leftBox.setStrokeStyle(4, 0xffffff)
           
           // 创建右盒子
-          const rightBox = this.add.rectangle(440, 152, 78, 78, 0xffffff)
-          rightBox.setStrokeStyle(4, 0x4a5568)
+          const rightBox = this.add.rectangle(440, 152, 78, 78, 0x000000)
+          rightBox.setStrokeStyle(4, 0xffffff)
           
           // 创建左边吊线
           const leftLine = this.add.graphics()
@@ -90,14 +90,14 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             
             // 清除并重绘吊线
             leftLine.clear()
-            leftLine.lineStyle(2, 0x4a5568)
+            leftLine.lineStyle(2, 0xffffff)
             leftLine.beginPath()
             leftLine.moveTo(leftWorldPoint.x, leftWorldPoint.y)
             leftLine.lineTo(leftWorldPoint.x, leftWorldPoint.y + 52 - boxHalfHeight)
             leftLine.strokePath()
             
             rightLine.clear()
-            rightLine.lineStyle(2, 0x4a5568)
+            rightLine.lineStyle(2, 0xffffff)
             rightLine.beginPath()
             rightLine.moveTo(rightWorldPoint.x, rightWorldPoint.y)
             rightLine.lineTo(rightWorldPoint.x, rightWorldPoint.y + 52 - boxHalfHeight)
@@ -183,7 +183,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                       blockHeight - 2, 
                       i < leftItem.filled ? this.getColorFromTailwind(leftItem.color) : 0xffffff
                     )
-                    block.setStrokeStyle(1, 0x000000)
+                    block.setStrokeStyle(1, 0xffffff)
                     leftFractionContainer.add(block)
                   }
                 } else {
@@ -198,14 +198,14 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                       blockHeight - 2, 
                       i < leftItem.filled ? this.getColorFromTailwind(leftItem.color) : 0xffffff
                     )
-                    block.setStrokeStyle(1, 0x000000)
+                    block.setStrokeStyle(1, 0xffffff)
                     leftFractionContainer.add(block)
                   }
                 }
               } else if (leftItem.type === "circle" && leftItem.percentage) {
                 // 圆形分数
                 const circle = this.add.circle(0, 0, 30, 0xffffff)
-                circle.setStrokeStyle(1, 0x000000)
+                circle.setStrokeStyle(1, 0xffffff)
                 leftFractionContainer.add(circle)
                 
                 // 创建扇形填充
@@ -264,7 +264,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                       blockHeight - 2, 
                       i < rightItem.filled ? this.getColorFromTailwind(rightItem.color) : 0xffffff
                     )
-                    block.setStrokeStyle(1, 0x000000)
+                    block.setStrokeStyle(1, 0xffffff)
                     rightFractionContainer.add(block)
                   }
                 } else {
@@ -279,14 +279,14 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                       blockHeight - 2, 
                       i < rightItem.filled ? this.getColorFromTailwind(rightItem.color) : 0xffffff
                     )
-                    block.setStrokeStyle(1, 0x000000)
+                    block.setStrokeStyle(1, 0xffffff)
                     rightFractionContainer.add(block)
                   }
                 }
               } else if (rightItem.type === "circle" && rightItem.percentage) {
                 // 圆形分数
                 const circle = this.add.circle(0, 0, 30, 0xffffff)
-                circle.setStrokeStyle(1, 0x000000)
+                circle.setStrokeStyle(1, 0xffffff)
                 rightFractionContainer.add(circle)
                 
                 // 创建扇形填充

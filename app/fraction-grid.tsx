@@ -45,10 +45,12 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
   );
   
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
+  const [lastDraggedItem, setLastDraggedItem] = useState<{item: FractionType, gridId: string} | null>(null);
 
   const handleDragStart = (e: DragEvent | React.TouchEvent, fraction: FractionType, gridItemId: string) => {
     if (fraction) {
       setDraggedItemId(gridItemId);
+      setLastDraggedItem({item: {...fraction}, gridId: gridItemId});
     }
     
     if ('dataTransfer' in e) {
@@ -139,7 +141,7 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     document.addEventListener('touchmove', handleTouchMove)
     document.addEventListener('touchend', handleTouchEnd)
     
-    // 监听自定义事件，当天平接收到拖放时触发
+    // 监听天平放置事件
     const handleBalanceDrop = () => {
       if (draggedItemId) {
         setGridItems(items => 
@@ -152,13 +154,50 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
         setDraggedItemId(null);
       }
     };
+
+    // 监听天平重置事件（配对错误时）
+    const handleBalanceReset = (e: CustomEvent) => {
+      const { leftItem, rightItem } = e.detail;
+      
+      // 找到两个空位来放置分数
+      setGridItems(items => {
+        const newItems = [...items];
+        let emptySlots = 0;
+        
+        // 先找出所有空位
+        const emptyIndices = newItems
+          .map((item, index) => item.fraction === null ? index : -1)
+          .filter(index => index !== -1);
+        
+        // 如果有左侧分数，放入第一个空位
+        if (leftItem && emptyIndices.length > emptySlots) {
+          newItems[emptyIndices[emptySlots]] = {
+            ...newItems[emptyIndices[emptySlots]],
+            fraction: leftItem
+          };
+          emptySlots++;
+        }
+        
+        // 如果有右侧分数，放入下一个空位
+        if (rightItem && emptyIndices.length > emptySlots) {
+          newItems[emptyIndices[emptySlots]] = {
+            ...newItems[emptyIndices[emptySlots]],
+            fraction: rightItem
+          };
+        }
+        
+        return newItems;
+      });
+    };
     
     window.addEventListener('balance-drop', handleBalanceDrop);
+    window.addEventListener('balance-reset', handleBalanceReset as EventListener);
     
     return () => {
       document.removeEventListener('touchmove', handleTouchMove)
       document.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('balance-drop', handleBalanceDrop);
+      window.removeEventListener('balance-reset', handleBalanceReset as EventListener);
     }
   }, [draggedItemId]);
 

@@ -100,6 +100,14 @@ export default function FractionMatcher() {
         setLeftBalance(null)
         setRightBalance(null)
         
+        // 触发自定义事件，通知分数网格将两个分数都放回原位
+        window.dispatchEvent(new CustomEvent('balance-reset', {
+          detail: {
+            leftItem: leftBalance,
+            rightItem: rightBalance
+          }
+        }))
+        
         // 设置反馈消失的定时器
         if (feedbackTimeoutRef.current) {
           clearTimeout(feedbackTimeoutRef.current)

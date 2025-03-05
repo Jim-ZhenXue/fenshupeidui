@@ -381,7 +381,6 @@ export default function FractionMatcher() {
           
           {/* 正确配对列表 */}
           <div className="mt-4 w-full">
-            <div className="text-sm font-semibold text-white mb-2">正确配对:</div>
             <div className="space-y-2 max-h-[150px] overflow-y-auto">
               {correctPairs.map((pair, index) => (
                 <div key={index} className="flex items-center justify-between bg-gray-800 p-1 rounded">

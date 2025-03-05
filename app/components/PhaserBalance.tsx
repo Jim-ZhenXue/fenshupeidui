@@ -17,6 +17,22 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
   useEffect(() => {
     if (!parentRef.current) return
 
+    // 添加全局倾斜事件监听器
+    const handleGlobalTiltEvent = (event: any) => {
+      console.log('Global tilt event received in useEffect:', event.detail);
+      if (event.detail && typeof event.detail.angle === 'number') {
+        if (gameRef.current) {
+          const scene = gameRef.current.scene.getScene('default');
+          if (scene) {
+            scene.events.emit('tilt-balance', event.detail.angle);
+          }
+        }
+      }
+    };
+
+    // 添加全局事件监听器
+    window.addEventListener('global-tilt-balance', handleGlobalTiltEvent);
+
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
       parent: parentRef.current,
@@ -46,6 +62,17 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             return colorMap[tailwindColor] || 0x38bdf8 // 默认蓝色
           }
           
+          // 监听canvas上的phaser-tilt事件
+          const canvas = this.sys.game.canvas;
+          if (canvas) {
+            canvas.addEventListener('phaser-tilt', (event: any) => {
+              console.log('Received phaser-tilt event on canvas:', event.detail);
+              if (event.detail && typeof event.detail.angle === 'number') {
+                this.events.emit('tilt-balance', event.detail.angle);
+              }
+            });
+          }
+          
           // 创建底座
           this.add.rectangle(250, 280, 200, 20, 0xffffff)
           
@@ -60,6 +87,20 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           
           // 创建横梁主体
           const beamRect = this.add.rectangle(0, 0, 400, 10, 0xffffff)
+          
+          // 暴露横梁对象以便直接操作
+          if (typeof window !== 'undefined') {
+            (window as any).phaserBalanceBeam = beam;
+            
+            // 添加直接倾斜方法
+            (window as any).directTiltBalance = (angle: number) => {
+              console.log('Direct beam tilt called with angle:', angle);
+              // 直接设置角度
+              beam.angle = angle;
+              // 更新吊线
+              updateLines();
+            };
+          }
           
           // 创建左盒子
           const leftBox = this.add.rectangle(60, 152, 78, 78, 0x000000)
@@ -370,6 +411,37 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           // 监听外部更新
           this.events.on('update-contents', updateBoxContents)
           
+          // 监听倾斜事件
+          this.events.on('tilt-balance', (angle: number | any) => {
+            console.log('Received tilt-balance event with angle:', angle);
+            
+            // 处理不同类型的输入
+            let targetAngle = 0;
+            if (typeof angle === 'number') {
+              targetAngle = angle;
+            } else if (angle && typeof angle.angle === 'number') {
+              targetAngle = angle.angle;
+            } else if (angle && typeof angle.detail === 'object' && typeof angle.detail.angle === 'number') {
+              targetAngle = angle.detail.angle;
+            }
+            
+            console.log('Using target angle for tilt:', targetAngle);
+            
+            // 添加倾斜动画
+            this.tweens.add({
+              targets: beam,
+              angle: targetAngle,
+              duration: 1000,
+              ease: 'Power2',
+              onUpdate: () => {
+                updateLines()
+              },
+              onComplete: () => {
+                console.log('Tilt animation completed with angle:', targetAngle);
+              }
+            })
+          })
+          
           // 当有新的物品放入时更新动画
           this.events.on('update-balance', () => {
             // 更新容器位置到盒子中心
@@ -382,9 +454,53 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             leftBox.setStrokeStyle(4, 0xffffff)
             rightBox.setStrokeStyle(4, 0xffffff)
             
+            // 计算分数的数值函数
+            const getFractionValue = (item: any): number => {
+              if (!item) return 0;
+              
+              if (item.type === "numeric" && item.value) {
+                const [num, den] = item.value.split('/').map(Number);
+                return num / den;
+              } else if (item.type === "block" && item.parts) {
+                return item.filled / item.parts;
+              } else if (item.type === "circle" && item.percentage) {
+                return item.percentage / 100;
+              }
+              return 0;
+            };
+            
+            // 确定天平倾斜方向
+            let targetAngle = 0;
+            
+            if (leftItem && rightItem) {
+              // 当两边都有物品时，比较大小决定倾斜方向
+              const leftValue = getFractionValue(leftItem);
+              const rightValue = getFractionValue(rightItem);
+              
+              if (Math.abs(leftValue - rightValue) < 0.01) {
+                // 数值几乎相等，保持平衡
+                targetAngle = 0;
+              } else if (leftValue > rightValue) {
+                // 左边更大，向左倾斜
+                targetAngle = -5;
+              } else {
+                // 右边更大，向右倾斜
+                targetAngle = 5;
+              }
+            } else if (leftItem && !rightItem) {
+              // 只有左边有物品
+              targetAngle = -5;
+            } else if (!leftItem && rightItem) {
+              // 只有右边有物品
+              targetAngle = 5;
+            } else {
+              // 两边都没有物品
+              targetAngle = 0;
+            }
+            
             this.tweens.add({
               targets: beam,
-              angle: leftItem && !rightItem ? -5 : rightItem && !leftItem ? 5 : 0,
+              angle: targetAngle,
               duration: 500,
               ease: 'Power2',
               onUpdate: () => {
@@ -472,6 +588,22 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
     // 创建游戏实例
     gameRef.current = new Phaser.Game(config)
 
+    // 暴露游戏实例给父组件
+    if (typeof window !== 'undefined') {
+      (window as any).phaserBalanceGame = gameRef.current;
+      
+      // 添加直接触发倾斜的方法
+      (window as any).tiltPhaserBalance = function(angle: number) {
+        console.log('Direct tilt called with angle:', angle);
+        if (gameRef.current) {
+          const scene = gameRef.current.scene.getScene('default');
+          if (scene) {
+            scene.events.emit('tilt-balance', angle);
+          }
+        }
+      };
+    }
+
     // 添加自定义事件监听器
     const handleCustomDrop = (event: CustomEvent) => {
       const { data, side } = event.detail
@@ -481,6 +613,17 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
         onRightDrop(data)
       }
     }
+
+    // 添加全局倾斜事件监听
+    const handleGlobalTilt = (event: CustomEvent) => {
+      console.log('Received global tilt event:', event.detail);
+      if (gameRef.current) {
+        const scene = gameRef.current.scene.getScene('default');
+        if (scene) {
+          scene.events.emit('tilt-balance', event.detail.angle);
+        }
+      }
+    };
 
     // 存储当前拖拽的数据
     let currentDragData: any = null
@@ -504,6 +647,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
     parentRef.current.addEventListener('custom-drop', handleCustomDrop as EventListener)
     window.addEventListener('dragstart', handleDragStart)
     window.addEventListener('get-drag-data', handleGetDragData as EventListener)
+    window.addEventListener('global-tilt-balance', handleGlobalTilt as EventListener)
 
     return () => {
       if (gameRef.current) {
@@ -512,6 +656,8 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
       parentRef.current?.removeEventListener('custom-drop', handleCustomDrop as EventListener)
       window.removeEventListener('dragstart', handleDragStart)
       window.removeEventListener('get-drag-data', handleGetDragData as EventListener)
+      window.removeEventListener('global-tilt-balance', handleGlobalTilt as EventListener)
+      window.removeEventListener('global-tilt-balance', handleGlobalTiltEvent);
     }
   }, [leftItem, rightItem])
 

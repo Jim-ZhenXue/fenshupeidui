@@ -19,6 +19,40 @@ export default function FractionMatcher() {
   const [showTryAgainButton, setShowTryAgainButton] = useState(false)
   const flashingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const gameRef = useRef<any>(null)
+
+  // 获取Phaser游戏实例
+  useEffect(() => {
+    // 等待Phaser游戏实例创建完成
+    const checkGameInstance = () => {
+      if (typeof window !== 'undefined' && (window as any).phaserBalanceGame) {
+        gameRef.current = (window as any).phaserBalanceGame;
+      } else {
+        setTimeout(checkGameInstance, 100);
+      }
+    };
+    
+    checkGameInstance();
+    
+    return () => {
+      gameRef.current = null;
+    };
+  }, []);
+
+  // 计算分数的实际值
+  const getFractionValue = (fraction: any): number => {
+    if (fraction.type === "numeric") {
+      const [num, den] = fraction.value.split("/").map(Number)
+      return num / den
+    }
+    if (fraction.type === "block") {
+      return fraction.filled / fraction.parts
+    }
+    if (fraction.type === "circle") {
+      return fraction.percentage / 100
+    }
+    return 0
+  }
 
   // 检查两个分数是否相等的函数
   const areFractionsEqual = (fraction1: any, fraction2: any) => {
@@ -118,6 +152,75 @@ export default function FractionMatcher() {
         // 显示失败反馈，但不立即重置天平
         setFeedback({ message: "再试一次", isSuccess: false })
         
+        // 计算两边的实际值
+        const leftValue = getFractionValue(leftBalance)
+        const rightValue = getFractionValue(rightBalance)
+        
+        // 触发天平倾斜动画 - 尝试多种方式确保成功
+        // 1. 通过游戏实例直接触发
+        if (gameRef.current) {
+          const scene = gameRef.current.scene.getScene('default')
+          if (scene) {
+            // 根据大小关系设置倾斜角度（-15表示左倾，15表示右倾）
+            const targetAngle = leftValue > rightValue ? -15 : 15
+            scene.events.emit('tilt-balance', targetAngle)
+            console.log('Emitting tilt-balance event with angle:', targetAngle);
+          } else {
+            console.log('Scene not found');
+          }
+        } else {
+          console.log('Game reference not found');
+        }
+        
+        // 2. 尝试使用直接方法
+        if (typeof window !== 'undefined' && 
+            (window as any).tiltPhaserBalance && 
+            typeof (window as any).tiltPhaserBalance === 'function') {
+          const targetAngle = leftValue > rightValue ? -15 : 15
+          try {
+            (window as any).tiltPhaserBalance(targetAngle);
+            console.log('Using direct tilt method with angle:', targetAngle);
+          } catch (error) {
+            console.error('Error using direct tilt method:', error);
+          }
+        }
+        
+        // 3. 尝试使用全局事件
+        if (typeof window !== 'undefined') {
+          const targetAngle = leftValue > rightValue ? -15 : 15
+          window.dispatchEvent(new CustomEvent('global-tilt-balance', {
+            detail: { angle: targetAngle }
+          }));
+          console.log('Dispatched global-tilt-balance event with angle:', targetAngle);
+        }
+        
+        // 4. 尝试直接找到Phaser画布并触发事件
+        try {
+          const phaserCanvas = document.querySelector('.phaser-balance canvas');
+          if (phaserCanvas) {
+            const targetAngle = leftValue > rightValue ? -15 : 15;
+            const event = new CustomEvent('phaser-tilt', {
+              detail: { angle: targetAngle }
+            });
+            phaserCanvas.dispatchEvent(event);
+            console.log('Dispatched phaser-tilt event directly to canvas');
+          }
+        } catch (error) {
+          console.error('Error dispatching event to canvas:', error);
+        }
+        
+        // 5. 尝试直接操作横梁
+        try {
+          if (typeof window !== 'undefined' && (window as any).directTiltBalance && 
+              typeof (window as any).directTiltBalance === 'function') {
+            const targetAngle = leftValue > rightValue ? -15 : 15;
+            (window as any).directTiltBalance(targetAngle);
+            console.log('Used direct beam tilt method with angle:', targetAngle);
+          }
+        } catch (error) {
+          console.error('Error using direct beam tilt method:', error);
+        }
+        
         // 隐藏检查按钮，显示"再试一次"按钮
         setShowCheckButton(false)
         setShowTryAgainButton(true)
@@ -132,6 +235,60 @@ export default function FractionMatcher() {
   
   // 处理"再试一次"按钮点击
   const handleTryAgainClick = () => {
+    // 重置天平倾斜 - 尝试多种方式确保成功
+    // 1. 通过游戏实例直接触发
+    if (gameRef.current) {
+      const scene = gameRef.current.scene.getScene('default')
+      if (scene) {
+        scene.events.emit('tilt-balance', 0)  // 重置为水平
+      }
+    }
+    
+    // 2. 尝试使用直接方法
+    if (typeof window !== 'undefined' && 
+        (window as any).tiltPhaserBalance && 
+        typeof (window as any).tiltPhaserBalance === 'function') {
+      try {
+        (window as any).tiltPhaserBalance(0);
+        console.log('Using direct tilt method to reset balance');
+      } catch (error) {
+        console.error('Error using direct tilt method to reset:', error);
+      }
+    }
+    
+    // 3. 尝试使用全局事件
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('global-tilt-balance', {
+        detail: { angle: 0 }
+      }));
+      console.log('Dispatched global-tilt-balance event to reset balance');
+    }
+    
+    // 4. 尝试直接找到Phaser画布并触发事件
+    try {
+      const phaserCanvas = document.querySelector('.phaser-balance canvas');
+      if (phaserCanvas) {
+        const event = new CustomEvent('phaser-tilt', {
+          detail: { angle: 0 }
+        });
+        phaserCanvas.dispatchEvent(event);
+        console.log('Dispatched phaser-tilt event directly to canvas to reset');
+      }
+    } catch (error) {
+      console.error('Error dispatching event to canvas for reset:', error);
+    }
+    
+    // 5. 尝试直接操作横梁
+    try {
+      if (typeof window !== 'undefined' && (window as any).directTiltBalance && 
+          typeof (window as any).directTiltBalance === 'function') {
+        (window as any).directTiltBalance(0);
+        console.log('Used direct beam tilt method to reset');
+      }
+    } catch (error) {
+      console.error('Error using direct beam tilt method for reset:', error);
+    }
+    
     // 重置天平
     setLeftBalance(null)
     setRightBalance(null)

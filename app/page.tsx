@@ -274,13 +274,26 @@ function renderMiniatureFraction(fraction: any) {
       </div>
     )
   } else if (fraction.type === "block" && fraction.parts) {
-    return (
-      <div className="h-full aspect-square grid" style={{ gridTemplateColumns: `repeat(${fraction.parts}, 1fr)` }}>
-        {Array.from({ length: fraction.parts }).map((_, i) => (
-          <div key={i} className={`border border-gray-700 ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
-        ))}
-      </div>
-    )
+    // 判断是否应该垂直排列（f3和f10）
+    const isVertical = fraction.id === "f3" || fraction.id === "f10";
+    
+    if (isVertical) {
+      return (
+        <div className="h-full aspect-square grid" style={{ gridTemplateRows: `repeat(${fraction.parts}, 1fr)` }}>
+          {Array.from({ length: fraction.parts }).map((_, i) => (
+            <div key={i} className={`border border-gray-700 ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
+          ))}
+        </div>
+      )
+    } else {
+      return (
+        <div className="h-full aspect-square grid" style={{ gridTemplateColumns: `repeat(${fraction.parts}, 1fr)` }}>
+          {Array.from({ length: fraction.parts }).map((_, i) => (
+            <div key={i} className={`border border-gray-700 ${i < (fraction.filled || 0) ? fraction.color : ""}`} />
+          ))}
+        </div>
+      )
+    }
   } else if (fraction.type === "circle") {
     return (
       <div className="h-full aspect-square relative rounded-full border border-gray-700">

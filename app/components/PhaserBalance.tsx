@@ -397,7 +397,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           // 添加动画效果
           this.tweens.add({
             targets: beam,
-            angle: leftItem && !rightItem ? -5 : rightItem && !leftItem ? 5 : 0,
+            angle: leftItem && !rightItem ? -1.7 : rightItem && !leftItem ? 1.7 : 0,
             duration: 500,
             ease: 'Power2',
             onUpdate: () => {
@@ -482,17 +482,17 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                 targetAngle = 0;
               } else if (leftValue > rightValue) {
                 // 左边更大，向左倾斜
-                targetAngle = -5;
+                targetAngle = -1.7;
               } else {
                 // 右边更大，向右倾斜
-                targetAngle = 5;
+                targetAngle = 1.7;
               }
             } else if (leftItem && !rightItem) {
               // 只有左边有物品
-              targetAngle = -5;
+              targetAngle = -1.7;
             } else if (!leftItem && rightItem) {
               // 只有右边有物品
-              targetAngle = 5;
+              targetAngle = 1.7;
             } else {
               // 两边都没有物品
               targetAngle = 0;

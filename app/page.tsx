@@ -161,8 +161,8 @@ export default function FractionMatcher() {
         if (gameRef.current) {
           const scene = gameRef.current.scene.getScene('default')
           if (scene) {
-            // 根据大小关系设置倾斜角度（-15表示左倾，15表示右倾）
-            const targetAngle = leftValue > rightValue ? -15 : 15
+            // 根据大小关系设置倾斜角度（-5表示左倾，5表示右倾）
+            const targetAngle = leftValue > rightValue ? -5 : 5
             scene.events.emit('tilt-balance', targetAngle)
             console.log('Emitting tilt-balance event with angle:', targetAngle);
           } else {
@@ -176,7 +176,7 @@ export default function FractionMatcher() {
         if (typeof window !== 'undefined' && 
             (window as any).tiltPhaserBalance && 
             typeof (window as any).tiltPhaserBalance === 'function') {
-          const targetAngle = leftValue > rightValue ? -15 : 15
+          const targetAngle = leftValue > rightValue ? -5 : 5
           try {
             (window as any).tiltPhaserBalance(targetAngle);
             console.log('Using direct tilt method with angle:', targetAngle);
@@ -187,7 +187,7 @@ export default function FractionMatcher() {
         
         // 3. 尝试使用全局事件
         if (typeof window !== 'undefined') {
-          const targetAngle = leftValue > rightValue ? -15 : 15
+          const targetAngle = leftValue > rightValue ? -5 : 5
           window.dispatchEvent(new CustomEvent('global-tilt-balance', {
             detail: { angle: targetAngle }
           }));
@@ -198,7 +198,7 @@ export default function FractionMatcher() {
         try {
           const phaserCanvas = document.querySelector('.phaser-balance canvas');
           if (phaserCanvas) {
-            const targetAngle = leftValue > rightValue ? -15 : 15;
+            const targetAngle = leftValue > rightValue ? -5 : 5;
             const event = new CustomEvent('phaser-tilt', {
               detail: { angle: targetAngle }
             });
@@ -213,7 +213,7 @@ export default function FractionMatcher() {
         try {
           if (typeof window !== 'undefined' && (window as any).directTiltBalance && 
               typeof (window as any).directTiltBalance === 'function') {
-            const targetAngle = leftValue > rightValue ? -15 : 15;
+            const targetAngle = leftValue > rightValue ? -5 : 5;
             (window as any).directTiltBalance(targetAngle);
             console.log('Used direct beam tilt method with angle:', targetAngle);
           }

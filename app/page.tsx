@@ -77,6 +77,20 @@ export default function FractionMatcher() {
   }
 
   const handleDrop = (side: "left" | "right", item: any) => {
+    // 检查该侧天平是否已有物品，若有则需要将其放回原位
+    const existingItem = side === "left" ? leftBalance : rightBalance;
+    
+    if (existingItem && existingItem.originalIndex !== undefined) {
+      // 触发自定义事件，通知分数网格将原物品放回原位
+      window.dispatchEvent(new CustomEvent('balance-reset', {
+        detail: {
+          leftItem: side === "left" ? existingItem : null,
+          rightItem: side === "right" ? existingItem : null
+        }
+      }));
+    }
+    
+    // 保留原始位置信息
     if (side === "left") {
       setLeftBalance(item)
     } else {
@@ -87,7 +101,13 @@ export default function FractionMatcher() {
   // 处理检查按钮点击
   const handleCheckClick = () => {
     if (leftBalance && rightBalance) {
-      const isEqual = areFractionsEqual(leftBalance, rightBalance)
+      // 在比较时忽略originalIndex
+      const leftCompare = {...leftBalance}
+      const rightCompare = {...rightBalance}
+      delete leftCompare.originalIndex
+      delete rightCompare.originalIndex
+      
+      const isEqual = areFractionsEqual(leftCompare, rightCompare)
       
       if (isEqual) {
         // 设置为正确匹配，但还不添加到列表

@@ -107,6 +107,10 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             leftBox.setPosition(leftWorldPoint.x, leftWorldPoint.y + 52)
             rightBox.setPosition(rightWorldPoint.x, rightWorldPoint.y + 52)
             
+            // 确保盒子轮廓线为白色
+            leftBox.setStrokeStyle(4, 0xffffff)
+            rightBox.setStrokeStyle(4, 0xffffff)
+            
             // 更新分数容器位置到盒子中心
             leftFractionContainer.setPosition(leftWorldPoint.x, leftWorldPoint.y + 52)
             rightFractionContainer.setPosition(rightWorldPoint.x, rightWorldPoint.y + 52)
@@ -145,23 +149,24 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                 // 创建分子
                 const numeratorText = this.add.text(0, -12, numerator, { 
                   font: '18px Arial', 
-                  color: '#ffffff',  
+                  color: '#ffffff',
                   align: 'center'
                 }).setOrigin(0.5)
                 
                 // 创建分数线
-                const line = this.add.rectangle(0, 0, 20, 2, 0xffffff)  
+                const line = this.add.rectangle(0, 0, 20, 2, 0xffffff)
+                line.setStrokeStyle(2, 0xffffff)  // 添加白色轮廓线
                 
                 // 创建分母
                 const denominatorText = this.add.text(0, 12, denominator, { 
                   font: '18px Arial', 
-                  color: '#ffffff',  
+                  color: '#ffffff',
                   align: 'center'
                 }).setOrigin(0.5)
                 
                 // 添加到容器
                 leftFractionContainer.add([numeratorText, line, denominatorText])
-              } else if (leftItem.type === "block" && leftItem.parts) {
+              } else if (leftItem.type === "block") {
                 // 方块分数
                 const blockWidth = 60 / leftItem.parts
                 const blockHeight = 60
@@ -181,9 +186,9 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                       startY + i * blockHeight, 
                       blockWidth - 2, 
                       blockHeight - 2, 
-                      i < leftItem.filled ? this.getColorFromTailwind(leftItem.color) : 0xffffff
+                      i < leftItem.filled ? this.getColorFromTailwind(leftItem.color) : 0x000000
                     )
-                    block.setStrokeStyle(1, 0xffffff)
+                    block.setStrokeStyle(2, 0xffffff)
                     leftFractionContainer.add(block)
                   }
                 } else {
@@ -196,23 +201,25 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                       0, 
                       blockWidth - 2, 
                       blockHeight - 2, 
-                      i < leftItem.filled ? this.getColorFromTailwind(leftItem.color) : 0xffffff
+                      i < leftItem.filled ? this.getColorFromTailwind(leftItem.color) : 0x000000
                     )
-                    block.setStrokeStyle(1, 0xffffff)
+                    block.setStrokeStyle(2, 0xffffff)
                     leftFractionContainer.add(block)
                   }
                 }
-              } else if (leftItem.type === "circle" && leftItem.percentage) {
+              } else if (leftItem.type === "circle") {
                 // 圆形分数
-                const circle = this.add.circle(0, 0, 30, 0xffffff)
-                circle.setStrokeStyle(1, 0xffffff)
+                const circle = this.add.circle(0, 0, 30, 0x000000)
+                circle.setStrokeStyle(2, 0xffffff)
                 leftFractionContainer.add(circle)
                 
                 // 创建扇形填充
                 const pie = this.add.graphics()
+                pie.lineStyle(2, 0xffffff)  // 添加白色轮廓线
                 pie.fillStyle(this.getColorFromTailwind(leftItem.color), 1)
                 pie.slice(0, 0, 30, 0, (leftItem.percentage / 100) * Math.PI * 2, true)
                 pie.fillPath()
+                pie.strokePath()  // 描边路径
                 leftFractionContainer.add(pie)
               }
             }
@@ -226,23 +233,24 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                 // 创建分子
                 const numeratorText = this.add.text(0, -12, numerator, { 
                   font: '18px Arial', 
-                  color: '#ffffff',  
+                  color: '#ffffff',
                   align: 'center'
                 }).setOrigin(0.5)
                 
                 // 创建分数线
-                const line = this.add.rectangle(0, 0, 20, 2, 0xffffff)  
+                const line = this.add.rectangle(0, 0, 20, 2, 0xffffff)
+                line.setStrokeStyle(2, 0xffffff)  // 添加白色轮廓线
                 
                 // 创建分母
                 const denominatorText = this.add.text(0, 12, denominator, { 
                   font: '18px Arial', 
-                  color: '#ffffff',  
+                  color: '#ffffff',
                   align: 'center'
                 }).setOrigin(0.5)
                 
                 // 添加到容器
                 rightFractionContainer.add([numeratorText, line, denominatorText])
-              } else if (rightItem.type === "block" && rightItem.parts) {
+              } else if (rightItem.type === "block") {
                 // 方块分数
                 const blockWidth = 60 / rightItem.parts
                 const blockHeight = 60
@@ -262,9 +270,9 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                       startY + i * blockHeight, 
                       blockWidth - 2, 
                       blockHeight - 2, 
-                      i < rightItem.filled ? this.getColorFromTailwind(rightItem.color) : 0xffffff
+                      i < rightItem.filled ? this.getColorFromTailwind(rightItem.color) : 0x000000
                     )
-                    block.setStrokeStyle(1, 0xffffff)
+                    block.setStrokeStyle(2, 0xffffff)
                     rightFractionContainer.add(block)
                   }
                 } else {
@@ -277,26 +285,32 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                       0, 
                       blockWidth - 2, 
                       blockHeight - 2, 
-                      i < rightItem.filled ? this.getColorFromTailwind(rightItem.color) : 0xffffff
+                      i < rightItem.filled ? this.getColorFromTailwind(rightItem.color) : 0x000000
                     )
-                    block.setStrokeStyle(1, 0xffffff)
+                    block.setStrokeStyle(2, 0xffffff)
                     rightFractionContainer.add(block)
                   }
                 }
-              } else if (rightItem.type === "circle" && rightItem.percentage) {
+              } else if (rightItem.type === "circle") {
                 // 圆形分数
-                const circle = this.add.circle(0, 0, 30, 0xffffff)
-                circle.setStrokeStyle(1, 0xffffff)
+                const circle = this.add.circle(0, 0, 30, 0x000000)
+                circle.setStrokeStyle(2, 0xffffff)
                 rightFractionContainer.add(circle)
                 
                 // 创建扇形填充
                 const pie = this.add.graphics()
+                pie.lineStyle(2, 0xffffff)  // 添加白色轮廓线
                 pie.fillStyle(this.getColorFromTailwind(rightItem.color), 1)
                 pie.slice(0, 0, 30, 0, (rightItem.percentage / 100) * Math.PI * 2, true)
                 pie.fillPath()
+                pie.strokePath()  // 描边路径
                 rightFractionContainer.add(pie)
               }
             }
+            
+            // 确保所有元素的轮廓线为白色
+            leftBox.setStrokeStyle(4, 0xffffff)
+            rightBox.setStrokeStyle(4, 0xffffff)
           }
           
           // 初始更新内容
@@ -310,7 +324,8 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
               const target = targets[0] as Phaser.GameObjects.Rectangle
               if (target === leftBox || target === rightBox) {
                 dragTarget = target
-                target.setTint(0xaaaaaa)
+                // 移除色调变化，保持白色轮廓
+                // target.setTint(0xaaaaaa)
               }
             }
           })
@@ -326,7 +341,10 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
           // 触摸/鼠标松开事件
           this.input.on('pointerup', () => {
             if (dragTarget) {
+              // 确保清除任何可能的色调
               dragTarget.clearTint()
+              // 重新设置轮廓线为白色
+              dragTarget.setStrokeStyle(4, 0xffffff)
               const dropZone = dragTarget === leftBox ? onLeftDrop : onRightDrop
               const item = dragTarget === leftBox ? leftItem : rightItem
               dropZone(item)
@@ -360,6 +378,10 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             leftFractionContainer.setPosition(leftBoxPos.x, leftBoxPos.y)
             rightFractionContainer.setPosition(rightBoxPos.x, rightBoxPos.y)
             
+            // 确保两个盒子的轮廓线为白色
+            leftBox.setStrokeStyle(4, 0xffffff)
+            rightBox.setStrokeStyle(4, 0xffffff)
+            
             this.tweens.add({
               targets: beam,
               angle: leftItem && !rightItem ? -5 : rightItem && !leftItem ? 5 : 0,
@@ -373,6 +395,35 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                 const rightBoxPos = rightBox.getCenter()
                 leftFractionContainer.setPosition(leftBoxPos.x, leftBoxPos.y)
                 rightFractionContainer.setPosition(rightBoxPos.x, rightBoxPos.y)
+                
+                // 确保盒子轮廓线为白色
+                leftBox.setStrokeStyle(4, 0xffffff)
+                rightBox.setStrokeStyle(4, 0xffffff)
+                
+                // 重新遍历所有fraction container子元素，确保它们的轮廓线为白色
+                try {
+                  leftFractionContainer.each((child: any) => {
+                    try {
+                      if (child && child.setStrokeStyle) {
+                        child.setStrokeStyle(2, 0xffffff);
+                      }
+                    } catch (err) {
+                      console.error('Error updating left fraction child stroke style:', err);
+                    }
+                  });
+                  
+                  rightFractionContainer.each((child: any) => {
+                    try {
+                      if (child && child.setStrokeStyle) {
+                        child.setStrokeStyle(2, 0xffffff);
+                      }
+                    } catch (err) {
+                      console.error('Error updating right fraction child stroke style:', err);
+                    }
+                  });
+                } catch (err) {
+                  console.error('Error updating fraction container children:', err);
+                }
               },
               onComplete: () => {
                 // 动画完成后再次确保分数图形在盒子中心
@@ -380,6 +431,35 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                 const rightBoxPos = rightBox.getCenter()
                 leftFractionContainer.setPosition(leftBoxPos.x, leftBoxPos.y)
                 rightFractionContainer.setPosition(rightBoxPos.x, rightBoxPos.y)
+                
+                // 确保两个盒子的轮廓线为白色
+                leftBox.setStrokeStyle(4, 0xffffff)
+                rightBox.setStrokeStyle(4, 0xffffff)
+                
+                // 重新遍历所有fraction container子元素，确保它们的轮廓线为白色
+                try {
+                  leftFractionContainer.each((child: any) => {
+                    try {
+                      if (child && child.setStrokeStyle) {
+                        child.setStrokeStyle(2, 0xffffff);
+                      }
+                    } catch (err) {
+                      console.error('Error updating left fraction child stroke style:', err);
+                    }
+                  });
+                  
+                  rightFractionContainer.each((child: any) => {
+                    try {
+                      if (child && child.setStrokeStyle) {
+                        child.setStrokeStyle(2, 0xffffff);
+                      }
+                    } catch (err) {
+                      console.error('Error updating right fraction child stroke style:', err);
+                    }
+                  });
+                } catch (err) {
+                  console.error('Error updating fraction container children:', err);
+                }
                 
                 updateBoxContents()
               }

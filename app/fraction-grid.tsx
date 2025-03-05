@@ -16,6 +16,7 @@ interface FractionType {
 interface GridItem {
   fraction: FractionType | null;
   id: string;
+  originalIndex?: number;
 }
 
 interface FractionGridProps {
@@ -40,22 +41,23 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
   const [gridItems, setGridItems] = useState<GridItem[]>(
     initialFractions.map((fraction, index) => ({
       fraction,
-      id: `grid-${index}`
+      id: `grid-${index}`,
+      originalIndex: index  // 添加原始位置索引
     }))
   );
   
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
-  const [lastDraggedItem, setLastDraggedItem] = useState<{item: FractionType, gridId: string} | null>(null);
+  const [draggedItem, setDraggedItem] = useState<{fraction: FractionType, originalIndex: number} | null>(null);
 
-  const handleDragStart = (e: DragEvent | React.TouchEvent, fraction: FractionType, gridItemId: string) => {
+  const handleDragStart = (e: DragEvent | React.TouchEvent, fraction: FractionType, gridItemId: string, originalIndex: number) => {
     if (fraction) {
       setDraggedItemId(gridItemId);
-      setLastDraggedItem({item: {...fraction}, gridId: gridItemId});
+      setDraggedItem({fraction: {...fraction}, originalIndex});
     }
     
     if ('dataTransfer' in e) {
       // Mouse drag event
-      e.dataTransfer.setData("text/plain", JSON.stringify(fraction))
+      e.dataTransfer.setData("text/plain", JSON.stringify({...fraction, originalIndex}))
     } else {
       // Touch event
       const touch = e.touches[0]
@@ -72,7 +74,7 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
       document.body.appendChild(clone)
       
       // Store the fraction data on the clone element
-      ;(window as any).dragData = fraction
+      ;(window as any).dragData = {...fraction, originalIndex}
     }
   }
 
@@ -159,29 +161,20 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     const handleBalanceReset = (e: CustomEvent) => {
       const { leftItem, rightItem } = e.detail;
       
-      // 找到两个空位来放置分数
+      // 将分数放回原位
       setGridItems(items => {
         const newItems = [...items];
-        let emptySlots = 0;
         
-        // 先找出所有空位
-        const emptyIndices = newItems
-          .map((item, index) => item.fraction === null ? index : -1)
-          .filter(index => index !== -1);
-        
-        // 如果有左侧分数，放入第一个空位
-        if (leftItem && emptyIndices.length > emptySlots) {
-          newItems[emptyIndices[emptySlots]] = {
-            ...newItems[emptyIndices[emptySlots]],
+        if (leftItem && leftItem.originalIndex !== undefined) {
+          newItems[leftItem.originalIndex] = {
+            ...newItems[leftItem.originalIndex],
             fraction: leftItem
           };
-          emptySlots++;
         }
         
-        // 如果有右侧分数，放入下一个空位
-        if (rightItem && emptyIndices.length > emptySlots) {
-          newItems[emptyIndices[emptySlots]] = {
-            ...newItems[emptyIndices[emptySlots]],
+        if (rightItem && rightItem.originalIndex !== undefined) {
+          newItems[rightItem.originalIndex] = {
+            ...newItems[rightItem.originalIndex],
             fraction: rightItem
           };
         }
@@ -203,7 +196,7 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
 
   return (
     <div className="w-full grid grid-cols-2 gap-1 border border-gray-700 p-1 bg-gray-900">
-      {gridItems.map((gridItem) => (
+      {gridItems.map((gridItem, index) => (
         <div
           key={gridItem.id}
           className="aspect-square border border-gray-700 p-1 bg-gray-800"
@@ -212,9 +205,9 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
             <div 
               className="w-full h-full cursor-move"
               draggable
-              onDragStart={(e) => handleDragStart(e, gridItem.fraction!, gridItem.id)}
+              onDragStart={(e) => handleDragStart(e, gridItem.fraction!, gridItem.id, index)}
               onDragEnd={handleDragEnd}
-              onTouchStart={(e) => handleDragStart(e, gridItem.fraction!, gridItem.id)}
+              onTouchStart={(e) => handleDragStart(e, gridItem.fraction!, gridItem.id, index)}
             >
               {gridItem.fraction.type === "numeric" ? (
                 <div className="flex h-full items-center justify-center">

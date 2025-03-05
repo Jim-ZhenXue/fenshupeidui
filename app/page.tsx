@@ -16,6 +16,7 @@ export default function FractionMatcher() {
   const [correctPairs, setCorrectPairs] = useState<any[]>([])
   const [feedback, setFeedback] = useState<{ message: string, isSuccess: boolean } | null>(null)
   const [isCorrectMatch, setIsCorrectMatch] = useState(false)
+  const [showTryAgainButton, setShowTryAgainButton] = useState(false)
   const flashingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -114,28 +115,12 @@ export default function FractionMatcher() {
         setIsCorrectMatch(true)
         setFeedback({ message: "😊", isSuccess: true })
       } else {
+        // 显示失败反馈，但不立即重置天平
         setFeedback({ message: "再试一次", isSuccess: false })
         
-        // 重置天平
-        setLeftBalance(null)
-        setRightBalance(null)
-        
-        // 触发自定义事件，通知分数网格将两个分数都放回原位
-        window.dispatchEvent(new CustomEvent('balance-reset', {
-          detail: {
-            leftItem: leftBalance,
-            rightItem: rightBalance
-          }
-        }))
-        
-        // 设置反馈消失的定时器
-        if (feedbackTimeoutRef.current) {
-          clearTimeout(feedbackTimeoutRef.current)
-        }
-        
-        feedbackTimeoutRef.current = setTimeout(() => {
-          setFeedback(null)
-        }, 2000)
+        // 隐藏检查按钮，显示"再试一次"按钮
+        setShowCheckButton(false)
+        setShowTryAgainButton(true)
       }
       
       if (flashingIntervalRef.current) {
@@ -143,6 +128,27 @@ export default function FractionMatcher() {
         flashingIntervalRef.current = null
       }
     }
+  }
+  
+  // 处理"再试一次"按钮点击
+  const handleTryAgainClick = () => {
+    // 重置天平
+    setLeftBalance(null)
+    setRightBalance(null)
+    
+    // 隐藏"再试一次"按钮
+    setShowTryAgainButton(false)
+    
+    // 清除反馈消息
+    setFeedback(null)
+    
+    // 触发自定义事件，通知分数网格将两个分数都放回原位
+    window.dispatchEvent(new CustomEvent('balance-reset', {
+      detail: {
+        leftItem: leftBalance,
+        rightItem: rightBalance
+      }
+    }))
   }
   
   // 处理确认按钮点击
@@ -165,11 +171,11 @@ export default function FractionMatcher() {
   // 监控天平两侧的状态，决定是否显示检查按钮
   useEffect(() => {
     // 当两侧都有分数时，清除任何"再试一次"消息
-    if (leftBalance && rightBalance && feedback && !feedback.isSuccess) {
+    if (leftBalance && rightBalance && feedback && !feedback.isSuccess && !showTryAgainButton) {
       setFeedback(null);
     }
     
-    if (leftBalance && rightBalance) {
+    if (leftBalance && rightBalance && !showTryAgainButton) {
       setShowCheckButton(true)
       setCheckButtonFlashing(true)
       
@@ -181,7 +187,7 @@ export default function FractionMatcher() {
       flashingIntervalRef.current = setInterval(() => {
         setCheckButtonFlashing(prev => !prev)
       }, 500)
-    } else {
+    } else if (!showTryAgainButton) {
       setShowCheckButton(false)
       setCheckButtonFlashing(false)
       
@@ -244,11 +250,21 @@ export default function FractionMatcher() {
           <div className="flex items-center justify-between w-full px-4 mb-4">
             <div className="text-lg font-semibold text-white">Score: {score}</div>
             
-            {/* 检查按钮/笑脸+确认按钮/再试一次消息 - 都在同一位置显示 */}
+            {/* 检查按钮/笑脸+确认按钮/再试一次按钮/再试一次消息 - 都在同一位置显示 */}
             <div className="flex items-center">
-              {feedback && !feedback.isSuccess ? (
+              {feedback && !feedback.isSuccess && !showTryAgainButton ? (
                 <div className="text-lg font-semibold text-yellow-400">
                   {feedback.message}
+                </div>
+              ) : showTryAgainButton ? (
+                <div className="flex items-center gap-2">
+                  <div className="text-2xl">😢</div>
+                  <Button 
+                    onClick={handleTryAgainClick}
+                    className="bg-yellow-600 hover:bg-yellow-700 transition-all"
+                  >
+                    再试一次
+                  </Button>
                 </div>
               ) : showCheckButton ? (
                 feedback && feedback.isSuccess ? (

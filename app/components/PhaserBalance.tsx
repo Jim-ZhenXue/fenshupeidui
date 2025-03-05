@@ -145,17 +145,17 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                 // 创建分子
                 const numeratorText = this.add.text(0, -12, numerator, { 
                   font: '18px Arial', 
-                  color: '#000000',
+                  color: '#ffffff',  
                   align: 'center'
                 }).setOrigin(0.5)
                 
                 // 创建分数线
-                const line = this.add.rectangle(0, 0, 20, 2, 0x000000)
+                const line = this.add.rectangle(0, 0, 20, 2, 0xffffff)  
                 
                 // 创建分母
                 const denominatorText = this.add.text(0, 12, denominator, { 
                   font: '18px Arial', 
-                  color: '#000000',
+                  color: '#ffffff',  
                   align: 'center'
                 }).setOrigin(0.5)
                 
@@ -226,17 +226,17 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
                 // 创建分子
                 const numeratorText = this.add.text(0, -12, numerator, { 
                   font: '18px Arial', 
-                  color: '#000000',
+                  color: '#ffffff',  
                   align: 'center'
                 }).setOrigin(0.5)
                 
                 // 创建分数线
-                const line = this.add.rectangle(0, 0, 20, 2, 0x000000)
+                const line = this.add.rectangle(0, 0, 20, 2, 0xffffff)  
                 
                 // 创建分母
                 const denominatorText = this.add.text(0, 12, denominator, { 
                   font: '18px Arial', 
-                  color: '#000000',
+                  color: '#ffffff',  
                   align: 'center'
                 }).setOrigin(0.5)
                 

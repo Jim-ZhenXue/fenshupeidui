@@ -33,8 +33,8 @@ export default function HomeButton() {
       <svg 
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 576 512" 
-        width="24" 
-        height="24" 
+        width="12" 
+        height="12" 
         fill="currentColor"
       >
         {/* Font Awesome Home图标的SVG路径 */}

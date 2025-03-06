@@ -442,6 +442,21 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             })
           })
           
+          // 监听重置事件
+          this.events.on('reset-balance', () => {
+            console.log('Received reset-balance event');
+            // 重置天平到初始状态
+            this.tweens.add({
+              targets: beam,
+              angle: 0,
+              duration: 500,
+              ease: 'Power2',
+              onUpdate: () => {
+                updateLines()
+              }
+            })
+          })
+          
           // 当有新的物品放入时更新动画
           this.events.on('update-balance', () => {
             // 更新容器位置到盒子中心
@@ -624,6 +639,27 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
         }
       }
     };
+    
+    // 添加游戏重置事件监听
+    const handleGameReset = (event: CustomEvent) => {
+      console.log('Received game reset event');
+      if (gameRef.current) {
+        const scene = gameRef.current.scene.getScene('default');
+        if (scene) {
+          // 重置天平到初始状态
+          scene.events.emit('tilt-balance', 0);
+          scene.events.emit('reset-balance');
+          
+          // 清空左右两侧的内容
+          if (typeof onLeftDrop === 'function') {
+            onLeftDrop(null);
+          }
+          if (typeof onRightDrop === 'function') {
+            onRightDrop(null);
+          }
+        }
+      }
+    };
 
     // 存储当前拖拽的数据
     let currentDragData: any = null
@@ -648,6 +684,7 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
     window.addEventListener('dragstart', handleDragStart)
     window.addEventListener('get-drag-data', handleGetDragData as EventListener)
     window.addEventListener('global-tilt-balance', handleGlobalTilt as EventListener)
+    window.addEventListener('reset-game', handleGameReset as EventListener)
 
     return () => {
       if (gameRef.current) {
@@ -657,7 +694,8 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
       window.removeEventListener('dragstart', handleDragStart)
       window.removeEventListener('get-drag-data', handleGetDragData as EventListener)
       window.removeEventListener('global-tilt-balance', handleGlobalTilt as EventListener)
-      window.removeEventListener('global-tilt-balance', handleGlobalTiltEvent);
+      window.removeEventListener('global-tilt-balance', handleGlobalTiltEvent)
+      window.removeEventListener('reset-game', handleGameReset as EventListener)
     }
   }, [leftItem, rightItem])
 

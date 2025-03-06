@@ -325,6 +325,74 @@ export default function FractionMatcher() {
     }
   }
   
+  // 处理重置按钮点击
+  const handleResetGame = () => {
+    // 重置所有状态
+    setScore(0);
+    setLevel(1);
+    setLeftBalance(null);
+    setRightBalance(null);
+    setShowCheckButton(false);
+    setCheckButtonFlashing(false);
+    setCorrectPairs([]);
+    setFeedback(null);
+    setIsCorrectMatch(false);
+    setShowTryAgainButton(false);
+    
+    // 重置天平位置
+    try {
+      // 1. 通过游戏实例直接触发
+      if (gameRef.current) {
+        const scene = gameRef.current.scene.getScene('default')
+        if (scene) {
+          scene.events.emit('tilt-balance', 0)
+          console.log('Emitting tilt-balance event to reset');
+        }
+      }
+      
+      // 2. 尝试使用直接方法
+      if (typeof window !== 'undefined' && 
+          (window as any).tiltPhaserBalance && 
+          typeof (window as any).tiltPhaserBalance === 'function') {
+        (window as any).tiltPhaserBalance(0);
+        console.log('Using direct tilt method to reset');
+      }
+      
+      // 3. 尝试使用全局事件
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('global-tilt-balance', {
+          detail: { angle: 0 }
+        }));
+        console.log('Dispatched global-tilt-balance event to reset');
+      }
+      
+      // 4. 尝试直接找到Phaser画布并触发事件
+      const phaserCanvas = document.querySelector('.phaser-balance canvas');
+      if (phaserCanvas) {
+        const event = new CustomEvent('phaser-tilt', {
+          detail: { angle: 0 }
+        });
+        phaserCanvas.dispatchEvent(event);
+        console.log('Dispatched phaser-tilt event directly to canvas to reset');
+      }
+      
+      // 5. 尝试直接操作横梁
+      if (typeof window !== 'undefined' && (window as any).directTiltBalance && 
+          typeof (window as any).directTiltBalance === 'function') {
+        (window as any).directTiltBalance(0);
+        console.log('Used direct beam tilt method to reset');
+      }
+      
+      // 触发重置事件，通知分数网格将所有物品放回原位
+      window.dispatchEvent(new CustomEvent('reset-game', {
+        detail: { resetAll: true }
+      }));
+      
+    } catch (error) {
+      console.error('Error resetting game:', error);
+    }
+  }
+  
   // 监控天平两侧的状态，决定是否显示检查按钮
   useEffect(() => {
     // 当两侧都有分数时，清除任何"再试一次"消息
@@ -374,7 +442,11 @@ export default function FractionMatcher() {
         <div className="w-[150px] flex flex-col items-center">
           <div className="flex items-center gap-2 mb-4">
             <div className="text-xl font-bold text-white">配对</div>
-            <div className="w-8 h-8 flex items-center justify-center">
+            <div 
+              className="w-8 h-8 flex items-center justify-center cursor-pointer hover:bg-gray-700 rounded-full transition-colors"
+              onClick={handleResetGame}
+              title="重置游戏"
+            >
               <RefreshCw className="h-4 w-4 text-white" />
             </div>
           </div>

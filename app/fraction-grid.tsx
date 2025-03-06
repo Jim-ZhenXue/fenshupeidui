@@ -143,9 +143,10 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     document.addEventListener('touchmove', handleTouchMove)
     document.addEventListener('touchend', handleTouchEnd)
     
-    // 监听天平放置事件
-    const handleBalanceDrop = () => {
-      if (draggedItemId) {
+    // 监听天平上的放置事件
+    const handleBalanceDrop = (e: CustomEvent) => {
+      if (draggedItemId && draggedItem) {
+        // 更新网格，移除被拖拽的项
         setGridItems(items => 
           items.map(item => 
             item.id === draggedItemId 
@@ -183,14 +184,30 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
       });
     };
     
+    // 监听游戏重置事件
+    const handleGameReset = (e: CustomEvent) => {
+      // 重置所有分数到初始位置
+      setGridItems(
+        initialFractions.map((fraction, index) => ({
+          fraction,
+          id: `grid-${index}`,
+          originalIndex: index
+        }))
+      );
+      setDraggedItemId(null);
+      setDraggedItem(null);
+    };
+    
     window.addEventListener('balance-drop', handleBalanceDrop);
     window.addEventListener('balance-reset', handleBalanceReset as EventListener);
+    window.addEventListener('reset-game', handleGameReset as EventListener);
     
     return () => {
       document.removeEventListener('touchmove', handleTouchMove)
       document.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('balance-drop', handleBalanceDrop);
       window.removeEventListener('balance-reset', handleBalanceReset as EventListener);
+      window.removeEventListener('reset-game', handleGameReset as EventListener);
     }
   }, [draggedItemId]);
 

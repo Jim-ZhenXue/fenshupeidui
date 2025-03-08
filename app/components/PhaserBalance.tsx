@@ -134,27 +134,27 @@ export default function PhaserBalance({ leftItem, rightItem, onLeftDrop, onRight
             leftLine.lineStyle(2, 0xffffff)
             leftLine.beginPath()
             leftLine.moveTo(leftWorldPoint.x, leftWorldPoint.y)
-            leftLine.lineTo(leftWorldPoint.x, leftWorldPoint.y + 52 - boxHalfHeight)
+            leftLine.lineTo(leftWorldPoint.x, leftWorldPoint.y + (52 - boxHalfHeight) * 2) // 延长吊线为原来的两倍
             leftLine.strokePath()
             
             rightLine.clear()
             rightLine.lineStyle(2, 0xffffff)
             rightLine.beginPath()
             rightLine.moveTo(rightWorldPoint.x, rightWorldPoint.y)
-            rightLine.lineTo(rightWorldPoint.x, rightWorldPoint.y + 52 - boxHalfHeight)
+            rightLine.lineTo(rightWorldPoint.x, rightWorldPoint.y + (52 - boxHalfHeight) * 2) // 延长吊线为原来的两倍
             rightLine.strokePath()
             
-            // 更新盒子位置
-            leftBox.setPosition(leftWorldPoint.x, leftWorldPoint.y + 52)
-            rightBox.setPosition(rightWorldPoint.x, rightWorldPoint.y + 52)
+            // 更新盒子位置 - 根据延长的吊线调整位置
+            leftBox.setPosition(leftWorldPoint.x, leftWorldPoint.y + (52 - boxHalfHeight) * 2 + boxHalfHeight)
+            rightBox.setPosition(rightWorldPoint.x, rightWorldPoint.y + (52 - boxHalfHeight) * 2 + boxHalfHeight)
             
             // 确保盒子轮廓线为白色
             leftBox.setStrokeStyle(4, 0xffffff)
             rightBox.setStrokeStyle(4, 0xffffff)
             
-            // 更新分数容器位置到盒子中心
-            leftFractionContainer.setPosition(leftWorldPoint.x, leftWorldPoint.y + 52)
-            rightFractionContainer.setPosition(rightWorldPoint.x, rightWorldPoint.y + 52)
+            // 更新分数容器位置到盒子中心 - 根据延长的吊线调整位置
+            leftFractionContainer.setPosition(leftWorldPoint.x, leftWorldPoint.y + (52 - boxHalfHeight) * 2 + boxHalfHeight)
+            rightFractionContainer.setPosition(rightWorldPoint.x, rightWorldPoint.y + (52 - boxHalfHeight) * 2 + boxHalfHeight)
           }
           
           beam.add([beamRect])

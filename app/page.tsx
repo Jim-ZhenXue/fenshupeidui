@@ -453,7 +453,7 @@ export default function FractionMatcher() {
           
           {/* 正确配对列表 */}
           <div className="mt-4 w-full">
-            <div className="space-y-2 max-h-[150px] overflow-y-auto">
+            <div className="space-y-2">
               {correctPairs.map((pair, index) => (
                 <div key={index} className="flex items-center justify-between bg-gray-800 p-1 rounded">
                   <div className="w-[45%] flex items-center justify-center">

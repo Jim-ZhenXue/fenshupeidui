@@ -64,11 +64,18 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
       const target = e.target as HTMLElement
       const clone = target.cloneNode(true) as HTMLElement
       
+      // 获取原始元素的宽高
+      const width = target.offsetWidth
+      const height = target.offsetHeight
+      
       clone.style.position = 'fixed'
-      clone.style.left = touch.clientX - target.offsetWidth / 2 + 'px'
-      clone.style.top = touch.clientY - target.offsetHeight / 2 + 'px'
+      clone.style.left = touch.clientX - width / 2 + 'px'
+      clone.style.top = touch.clientY - height / 2 + 'px'
+      clone.style.width = width + 'px'
+      clone.style.height = height + 'px'
       clone.style.opacity = '0.8'
       clone.style.pointerEvents = 'none'
+      clone.style.aspectRatio = '1/1' // 确保宽高比保持1:1
       clone.id = 'dragging-clone'
       
       document.body.appendChild(clone)
@@ -82,8 +89,10 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     const clone = document.getElementById('dragging-clone')
     if (clone && e instanceof TouchEvent) {
       const touch = e.touches[0]
-      clone.style.left = touch.clientX - clone.offsetWidth / 2 + 'px'
-      clone.style.top = touch.clientY - clone.offsetHeight / 2 + 'px'
+      const width = clone.offsetWidth
+      const height = clone.offsetHeight
+      clone.style.left = touch.clientX - width / 2 + 'px'
+      clone.style.top = touch.clientY - height / 2 + 'px'
     }
   }
 
@@ -144,7 +153,8 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     document.addEventListener('touchend', handleTouchEnd)
     
     // 监听天平上的放置事件
-    const handleBalanceDrop = (e: CustomEvent) => {
+    const handleBalanceDrop = (e: Event) => {
+      const customEvent = e as CustomEvent;
       if (draggedItemId && draggedItem) {
         // 更新网格，移除被拖拽的项
         setGridItems(items => 
@@ -159,8 +169,9 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     };
 
     // 监听天平重置事件（配对错误时）
-    const handleBalanceReset = (e: CustomEvent) => {
-      const { leftItem, rightItem } = e.detail;
+    const handleBalanceReset = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { leftItem, rightItem } = customEvent.detail;
       
       // 将分数放回原位
       setGridItems(items => {
@@ -185,7 +196,7 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     };
     
     // 监听游戏重置事件
-    const handleGameReset = (e: CustomEvent) => {
+    const handleGameReset = (e: Event) => {
       // 重置所有分数到初始位置
       setGridItems(
         initialFractions.map((fraction, index) => ({
@@ -199,15 +210,15 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
     };
     
     window.addEventListener('balance-drop', handleBalanceDrop);
-    window.addEventListener('balance-reset', handleBalanceReset as EventListener);
-    window.addEventListener('reset-game', handleGameReset as EventListener);
+    window.addEventListener('balance-reset', handleBalanceReset);
+    window.addEventListener('reset-game', handleGameReset);
     
     return () => {
       document.removeEventListener('touchmove', handleTouchMove)
       document.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('balance-drop', handleBalanceDrop);
-      window.removeEventListener('balance-reset', handleBalanceReset as EventListener);
-      window.removeEventListener('reset-game', handleGameReset as EventListener);
+      window.removeEventListener('balance-reset', handleBalanceReset);
+      window.removeEventListener('reset-game', handleGameReset);
     }
   }, [draggedItemId]);
 
@@ -237,22 +248,22 @@ export default function FractionGrid({ onMatch }: FractionGridProps) {
                   )}
                 </div>
               ) : gridItem.fraction.type === "block" && gridItem.fraction.parts ? (
-                <div className={`h-full ${gridItem.fraction.id === "f3" || gridItem.fraction.id === "f10" ? "flex flex-col" : "grid"}`} style={{ 
-                  ...(gridItem.fraction.id !== "f3" && gridItem.fraction.id !== "f10" ? { gridTemplateColumns: `repeat(${gridItem.fraction.parts}, 1fr)` } : {})
+                <div className={`h-full ${gridItem.fraction?.id === "f3" || gridItem.fraction?.id === "f10" ? "flex flex-col" : "grid"}`} style={{ 
+                  ...(gridItem.fraction?.id !== "f3" && gridItem.fraction?.id !== "f10" ? { gridTemplateColumns: `repeat(${gridItem.fraction?.parts || 1}, 1fr)` } : {})
                 }}>
-                  {Array.from({ length: gridItem.fraction.parts }).map((_, i) => (
+                  {Array.from({ length: gridItem.fraction?.parts || 0 }).map((_, i) => (
                     <div 
                       key={i} 
-                      className={`border border-white ${i < (gridItem.fraction.filled || 0) ? gridItem.fraction.color : ""} ${gridItem.fraction.id === "f3" || gridItem.fraction.id === "f10" ? "flex-1" : ""}`} 
+                      className={`border border-white ${i < (gridItem.fraction?.filled || 0) ? gridItem.fraction?.color || '' : ""} ${gridItem.fraction?.id === "f3" || gridItem.fraction?.id === "f10" ? "flex-1" : ""}`} 
                     />
                   ))}
                 </div>
               ) : (
-                <div className="relative h-full w-full rounded-full border border-white">
+                <div className="relative h-full w-full rounded-full border border-white overflow-hidden" style={{ aspectRatio: '1/1' }}>
                   <div
-                    className={`absolute h-full w-full rounded-full ${gridItem.fraction.color}`}
+                    className={`absolute h-full w-full rounded-full ${gridItem.fraction?.color || ''}`}
                     style={{
-                      clipPath: `polygon(0 0, 100% 0, 100% ${gridItem.fraction.percentage}%, 0 ${gridItem.fraction.percentage}%)`,
+                      clipPath: `polygon(0 0, 100% 0, 100% ${gridItem.fraction?.percentage || 0}%, 0 ${gridItem.fraction?.percentage || 0}%)`,
                     }}
                   />
                 </div>

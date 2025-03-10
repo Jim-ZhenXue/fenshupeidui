@@ -27,6 +27,26 @@ export default function RootLayout({
         <HomeButton />
         {children}
         <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            // 预加载音效文件
+            window.addEventListener('DOMContentLoaded', () => {
+              const sounds = [
+                '/sounds/correct.mp3',
+                '/sounds/incorrect.mp3',
+                '/sounds/click.mp3',
+                '/sounds/try-again.mp3',
+                '/sounds/drop.mp3'
+              ];
+              
+              // 预加载所有音效
+              sounds.forEach(src => {
+                const audio = new Audio();
+                audio.src = src;
+              });
+            });
+          `
+        }} />
       </body>
     </html>
   )

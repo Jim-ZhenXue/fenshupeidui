@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { RefreshCw } from "lucide-react"
 import FractionGrid from "./fraction-grid"
 import Balance from "./balance"
+import { playSound, initSounds, SoundType } from "./utils/sounds"
 
 export default function FractionMatcher() {
   const [score, setScore] = useState(0)
@@ -20,6 +21,12 @@ export default function FractionMatcher() {
   const flashingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const gameRef = useRef<any>(null)
+  
+  // 初始化音效系统
+  useEffect(() => {
+    // 预加载所有音效
+    initSounds();
+  }, []);
 
   // 获取Phaser游戏实例
   useEffect(() => {
@@ -112,6 +119,9 @@ export default function FractionMatcher() {
   }
 
   const handleDrop = (side: "left" | "right", item: any) => {
+    // 播放放置音效
+    playSound('drop');
+    
     // 检查该侧天平是否已有物品，若有则需要将其放回原位
     const existingItem = side === "left" ? leftBalance : rightBalance;
     
@@ -135,6 +145,9 @@ export default function FractionMatcher() {
   
   // 处理检查按钮点击
   const handleCheckClick = () => {
+    // 播放点击音效
+    playSound('click');
+    
     if (leftBalance && rightBalance) {
       // 在比较时忽略originalIndex
       const leftCompare = {...leftBalance}
@@ -145,10 +158,16 @@ export default function FractionMatcher() {
       const isEqual = areFractionsEqual(leftCompare, rightCompare)
       
       if (isEqual) {
+        // 播放正确音效
+        playSound('correct');
+        
         // 设置为正确匹配，但还不添加到列表
         setIsCorrectMatch(true)
         setFeedback({ message: "😊", isSuccess: true })
       } else {
+        // 播放错误音效
+        playSound('incorrect');
+        
         // 显示失败反馈，但不立即重置天平
         setFeedback({ message: "再试一次", isSuccess: false })
         
@@ -235,6 +254,9 @@ export default function FractionMatcher() {
   
   // 处理"再试一次"按钮点击
   const handleTryAgainClick = () => {
+    // 播放"再试一次"音效
+    playSound('tryAgain');
+    
     // 重置天平倾斜 - 尝试多种方式确保成功
     // 1. 通过游戏实例直接触发
     if (gameRef.current) {
@@ -310,6 +332,9 @@ export default function FractionMatcher() {
   
   // 处理确认按钮点击
   const handleConfirmClick = () => {
+    // 播放点击音效
+    playSound('click');
+    
     if (isCorrectMatch && leftBalance && rightBalance) {
       // 添加到正确配对列表
       setCorrectPairs(prev => [...prev, { left: leftBalance, right: rightBalance }])
@@ -327,6 +352,9 @@ export default function FractionMatcher() {
   
   // 处理重置按钮点击
   const handleResetGame = () => {
+    // 播放点击音效
+    playSound('click');
+    
     // 重置所有状态
     setScore(0);
     setLevel(1);

@@ -23,12 +23,13 @@ const sounds: Record<SoundType, HTMLAudioElement> = {} as Record<SoundType, HTML
 // 加载指定音效
 const loadSound = (type: SoundType): HTMLAudioElement => {
   if (!sounds[type]) {
+    console.log(`正在加载音效: ${type}, 路径: ${soundSources[type]}`);
     // 加载本地音效文件
     sounds[type] = new Audio(soundSources[type]);
     
     // 添加错误处理，如果本地文件加载失败，记录错误但不使用备用源
-    sounds[type].onerror = () => {
-      console.log(`本地音效加载失败(${type})`);
+    sounds[type].onerror = (e) => {
+      console.error(`本地音效加载失败(${type}):`, e);
       // 不再使用备用音效
     };
     
@@ -59,6 +60,7 @@ const initSounds = () => {
 // 播放指定音效
 const playSound = (soundName: SoundType) => {
   try {
+    console.log(`尝试播放音效: ${soundName}`);
     // 获取或加载音效
     const sound = loadSound(soundName);
     
@@ -67,12 +69,15 @@ const playSound = (soundName: SoundType) => {
     sound.currentTime = 0;
     
     // 尝试播放音效
+    console.log(`开始播放音效: ${soundName}, 音量: ${sound.volume}`);
     const playPromise = sound.play();
     
     // 处理播放承诺，处理潜在的自动播放限制
     if (playPromise !== undefined) {
-      playPromise.catch(err => {
-        console.log(`音效播放受限(${soundName}):`, err);
+      playPromise.then(() => {
+        console.log(`音效播放成功: ${soundName}`);
+      }).catch(err => {
+        console.error(`音效播放受限(${soundName}):`, err);
         // 不再尝试使用备用方案播放
       });
     }

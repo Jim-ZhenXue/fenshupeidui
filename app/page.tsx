@@ -120,7 +120,17 @@ export default function FractionMatcher() {
 
   const handleDrop = (side: "left" | "right", item: any) => {
     // 播放放置音效
+    console.log("触发放置事件，准备播放drop音效");
     playSound('drop');
+    
+    // 手动创建并播放音效，作为备用方案
+    try {
+      const audio = new Audio('/sounds/drop.mp3');
+      audio.volume = 0.4;
+      audio.play().catch(err => console.error("直接播放drop音效失败:", err));
+    } catch (e) {
+      console.error("创建drop音效对象失败:", e);
+    }
     
     // 检查该侧天平是否已有物品，若有则需要将其放回原位
     const existingItem = side === "left" ? leftBalance : rightBalance;

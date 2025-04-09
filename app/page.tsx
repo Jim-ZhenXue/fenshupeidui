@@ -465,8 +465,8 @@ export default function FractionMatcher() {
   }, [leftBalance, rightBalance, feedback])
 
   return (
-    <div className="h-screen overflow-hidden bg-black p-4">
-      <div className="w-[800px] mx-auto flex gap-2">
+    <div className="h-screen overflow-hidden bg-black p-4 flex items-center justify-center">
+      <div className="w-[800px] flex gap-2">
         {/* 左侧区域 */}
         <div className="w-[150px] flex flex-col items-center">
           <div className="flex items-center gap-2 mb-4">
@@ -481,18 +481,18 @@ export default function FractionMatcher() {
           </div>
           
           {/* 正确配对列表 */}
-          <div className="mt-4 w-full max-w-md mx-auto">
+          <div className="mt-4 w-full">
             <div className="space-y-2">
               {correctPairs.map((pair, index) => (
-                <div key={index} className="flex items-center justify-between bg-gray-800 p-2 md:p-3 rounded">
+                <div key={index} className="flex items-center justify-between bg-gray-800 p-1 rounded">
                   <div className="w-[45%] flex items-center justify-center">
-                    <div className="w-1/2 md:w-2/3 aspect-square">
+                    <div className="w-1/2 aspect-square">
                       {renderMiniatureFraction(pair.left)}
                     </div>
                   </div>
                   <div className="text-white">=</div>
                   <div className="w-[45%] flex items-center justify-center">
-                    <div className="w-1/2 md:w-2/3 aspect-square">
+                    <div className="w-1/2 aspect-square">
                       {renderMiniatureFraction(pair.right)}
                     </div>
                   </div>
@@ -503,22 +503,22 @@ export default function FractionMatcher() {
         </div>
 
         {/* 中间区域 - 天平 */}
-        <div className="flex-1 flex flex-col items-center max-w-2xl mx-auto w-full">
+        <div className="flex-1 flex flex-col items-center">
           <div className="flex items-center justify-between w-full px-4 mb-4">
-            <div className="text-base md:text-lg lg:text-xl font-semibold text-white">Score: {score}</div>
+            <div className="text-lg font-semibold text-white">Score: {score}</div>
             
             {/* 检查按钮/笑脸+确认按钮/再试一次按钮/再试一次消息 - 都在同一位置显示 */}
             <div className="flex items-center">
               {feedback && !feedback.isSuccess && !showTryAgainButton ? (
-                <div className="text-base md:text-lg lg:text-xl font-semibold text-yellow-400">
+                <div className="text-lg font-semibold text-yellow-400">
                   {feedback.message}
                 </div>
               ) : showTryAgainButton ? (
                 <div className="flex items-center gap-2">
-                  <div className="text-xl md:text-2xl lg:text-3xl">😢</div>
+                  <div className="text-2xl">😢</div>
                   <Button 
                     onClick={handleTryAgainClick}
-                    className="bg-yellow-600 hover:bg-yellow-700 transition-all text-base md:text-lg"
+                    className="bg-yellow-600 hover:bg-yellow-700 transition-all"
                   >
                     再试一次
                   </Button>
@@ -526,10 +526,10 @@ export default function FractionMatcher() {
               ) : showCheckButton ? (
                 feedback && feedback.isSuccess ? (
                   <div className="flex items-center gap-2">
-                    <div className="text-xl md:text-2xl lg:text-3xl">😊</div>
+                    <div className="text-2xl">😊</div>
                     <Button 
                       onClick={handleConfirmClick}
-                      className="bg-blue-600 hover:bg-blue-700 transition-all text-base md:text-lg"
+                      className="bg-blue-600 hover:bg-blue-700 transition-all"
                     >
                       确认
                     </Button>
@@ -537,7 +537,7 @@ export default function FractionMatcher() {
                 ) : (
                   <Button 
                     onClick={handleCheckClick}
-                    className={`bg-green-600 hover:bg-green-700 transition-all text-base md:text-lg ${checkButtonFlashing ? 'animate-pulse' : ''}`}
+                    className={`bg-green-600 hover:bg-green-700 transition-all ${checkButtonFlashing ? 'animate-pulse' : ''}`}
                   >
                     检查
                   </Button>
